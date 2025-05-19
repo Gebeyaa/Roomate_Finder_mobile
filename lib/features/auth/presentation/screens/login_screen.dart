@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/login_bloc.dart';
+import '../bloc/login_event.dart';
 import '../bloc/login_state.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -18,15 +19,31 @@ class _LoginScreenState extends State<LoginScreen> {
   final _passwordController = TextEditingController();
 
   bool _isPasswordVisible = false;
+  bool _isLoading = false;
+  Future<void> _login() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true); // Start loading
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+
+    context.read<LoginBloc>().add(
+      LoginSubmitted(email: email, password: password),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Arhibu"), centerTitle: true),
+      appBar: AppBar(
+        // leading: Image.asset('images/arhibu.jpg', width: 50, height: 50),
+        automaticallyImplyLeading: false,
+        title: const Text("Arhibu"),
+        centerTitle: true,
+      ),
       body: BlocListener<LoginBloc, LoginState>(
         listener: (context, state) {
           if (state is LoginSuccess) {
-            // Handle successful login
           } else if (state is LoginFailure) {
             ScaffoldMessenger.of(
               context,
@@ -43,14 +60,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 40),
                 Text(
                   "Log In",
-                  style:
-                      AppTheme
-                          .textTheme
-                          .displayMedium, // Use AppTheme for text style
+                  style: AppTheme.textTheme.displayMedium,
                   textAlign: TextAlign.center,
                 ),
-
-                const SizedBox(height: 20),
+                const SizedBox(height: 25),
                 TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
@@ -99,12 +112,30 @@ class _LoginScreenState extends State<LoginScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your password';
                     }
+                    if (value.length < 6) {
+                      return 'Password must be at least 6 characters';
+                    }
+
                     return null;
                   },
                 ),
                 const SizedBox(height: 30),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    if (_formKey.currentState!.validate()) {
+                      if (!_isLoading) {
+                        _login();
+                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Please enter proper input for the above input.',
+                          ),
+                        ),
+                      );
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.secondaryColor,
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -123,47 +154,6 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: const Text(
                     "Forgot password?",
                     style: TextStyle(color: Colors.blue),
-                  ),
-                ),
-                const SizedBox(height: 25),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Divider(color: Colors.grey[400], thickness: 1),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                        "OR",
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    ),
-                    Expanded(
-                      child: Divider(color: Colors.grey[400], thickness: 1),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 30),
-
-                OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    side: BorderSide(color: Colors.grey[300]!),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset('images/google.png', height: 24),
-                      const SizedBox(width: 10),
-                      const Text(
-                        "Continue with Google",
-                        style: TextStyle(fontSize: 16, color: Colors.black87),
-                      ),
-                    ],
                   ),
                 ),
 

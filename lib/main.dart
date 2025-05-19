@@ -9,12 +9,14 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Arhibu',
-      initialRoute: RouteNames.login,
+      initialRoute: RouteNames.getstarted,
       onGenerateRoute: AppRouter.generateRoute,
       theme: AppTheme.lightTheme,
     );

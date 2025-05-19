@@ -1,8 +1,9 @@
 class EndPoints {
-  static const String baserUrl = "https://jsonplaceholder.typicode.com/";
+  static const String baserUrl = "https://visit-addis.onrender.com/api/v1/auth/register";
   static const String template = "template/";
   static const String user = "users/";
   static const String post = "posts/";
+  static const String id = '';
 }
 
 class ApiKey {

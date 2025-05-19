@@ -1,3 +1,6 @@
+import 'package:arhibu/core/theme/app_theme.dart';
+import 'package:arhibu/features/auth/data/datasources/user_remote_data_source.dart';
+import 'package:arhibu/features/auth/data/models/user_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -13,28 +16,32 @@ class SignupScreen extends StatefulWidget {
 
 class _SignupScreenState extends State<SignupScreen> {
   final _formKey = GlobalKey<FormState>();
+  final _usernameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
+  bool isLoading = false;
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(
-          "Arhibu",
-          style: TextStyle(
-            fontSize: 24,
-            fontWeight: FontWeight.bold,
-            color: const Color.fromARGB(255, 60, 219, 240),
-          ),
-        ),
+        // leading: Image.asset('images/arhibu.jpg', width: 50, height: 50),
+        automaticallyImplyLeading: false,
+        title: const Text("Arhibu"),
         centerTitle: true,
-        backgroundColor: Colors.white,
-        elevation: 0,
       ),
       body: BlocListener<SignupBloc, SignupState>(
         listener: (context, state) {
@@ -57,18 +64,48 @@ class _SignupScreenState extends State<SignupScreen> {
               children: [
                 const SizedBox(height: 20),
                 Text(
-                  "Sign Up",
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
+                  "Sign up",
+                  style: AppTheme.textTheme.displayMedium,
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 30),
+
+                Text(
+                  "Full name",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 5),
+                TextFormField(
+                  controller: _emailController,
+                  decoration: InputDecoration(
+                    hintText: "Enter your full name",
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 15,
+                      vertical: 15,
+                    ),
+                  ),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your  full name';
+                    }
+                    if (value.length < 2) {
+                      return "Please Enter proper Full name  is not proper";
+                    }
+
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 20),
                 Text(
                   "Email",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(height: 5),
                 TextFormField(
-                  controller: _emailController,
+                  controller: _usernameController,
                   decoration: InputDecoration(
                     hintText: "Enter your email",
                     border: OutlineInputBorder(
@@ -83,9 +120,13 @@ class _SignupScreenState extends State<SignupScreen> {
                     if (value == null || value.isEmpty) {
                       return 'Please enter your email';
                     }
-                    if (!value.contains('@')) {
-                      return 'Please enter a valid email';
+                    final emailRegex = RegExp(
+                      r'^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$',
+                    );
+                    if (!emailRegex.hasMatch(value)) {
+                      return 'Please enter a valid email address (e.g. user@example.com)';
                     }
+
                     return null;
                   },
                 ),
@@ -126,6 +167,21 @@ class _SignupScreenState extends State<SignupScreen> {
                     }
                     if (value.length < 6) {
                       return 'Password must be at least 6 characters';
+                    }
+                    if (value.length < 6) {
+                      return 'Password must be at least 6 characters';
+                    }
+                    if (!RegExp(r'[A-Z]').hasMatch(value)) {
+                      return 'Password must contain at least one uppercase letter';
+                    }
+                    if (!RegExp(r'[a-z]').hasMatch(value)) {
+                      return 'Password must contain at least one lowercase letter';
+                    }
+                    if (!RegExp(r'[0-9]').hasMatch(value)) {
+                      return 'Password must contain at least one number';
+                    }
+                    if (!RegExp(r'[!@#\$&*~]').hasMatch(value)) {
+                      return 'Password must contain at least one special character (!@#\$&*~)';
                     }
                     return null;
                   },
@@ -173,8 +229,47 @@ class _SignupScreenState extends State<SignupScreen> {
                   },
                 ),
                 const SizedBox(height: 30),
+
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () async {
+                    if (_formKey.currentState!.validate()) {
+                      setState(() => isLoading = true);
+                      final user = UserModel(
+                        userName: _usernameController.text.trim(),
+                        email: _emailController.text.trim(),
+                        password: _passwordController.text.trim(),
+                      );
+                      final api = RemoteDatasource();
+                      final result = await api.register(user);
+                      setState(() => isLoading = false);
+                      if (result.success) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Registration successful.'),
+                          ),
+                        );
+                        Navigator.pushReplacementNamed(context, '/login');
+                      } else {
+                        String errorMsg =
+                            result.errorMessage ?? 'Registration failed.';
+                        if (errorMsg.toLowerCase().contains('internet')) {
+                          errorMsg =
+                              'No internet connection. Please check your network and try again.';
+                        }
+                        ScaffoldMessenger.of(
+                          context,
+                        ).showSnackBar(SnackBar(content: Text(errorMsg)));
+                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Registration failed. Please enter proper input.',
+                          ),
+                        ),
+                      );
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color.fromARGB(255, 60, 219, 240),
                     padding: const EdgeInsets.symmetric(vertical: 16),
@@ -191,47 +286,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 20),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Divider(color: Colors.grey[400], thickness: 1),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 10),
-                      child: Text(
-                        "OR",
-                        style: TextStyle(color: Colors.grey[600]),
-                      ),
-                    ),
-                    Expanded(
-                      child: Divider(color: Colors.grey[400], thickness: 1),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 20),
 
-                OutlinedButton(
-                  onPressed: () {},
-                  style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    side: BorderSide(color: Colors.grey[300]!),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                  ),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Image.asset('images/google.png', height: 24),
-                      const SizedBox(width: 10),
-                      const Text(
-                        "Continue with Google",
-                        style: TextStyle(fontSize: 16, color: Colors.black87),
-                      ),
-                    ],
-                  ),
-                ),
                 const SizedBox(height: 30),
                 RichText(
                   textAlign: TextAlign.center,
@@ -268,7 +323,9 @@ class _SignupScreenState extends State<SignupScreen> {
                       style: TextStyle(color: Colors.grey[600]),
                     ),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        Navigator.pushNamed(context, '/login');
+                      },
                       child: Text(
                         "Sign in",
                         style: TextStyle(
