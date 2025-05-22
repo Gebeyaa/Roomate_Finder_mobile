@@ -42,6 +42,7 @@ dependencies:
   dio: ^5.8.0+1
   data_connection_checker_tv: ^0.3.5-nullsafety
   dartz: ^0.10.1
+  equatable: ^2.0.7
 
 dev_dependencies:
   flutter_test:

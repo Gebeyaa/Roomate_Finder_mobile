@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 
 class AppTheme {
@@ -71,7 +70,8 @@ class AppTheme {
     primaryColor: primaryColor,
     colorScheme: ColorScheme.light(
       primary: primaryColor,
-      secondary: secondaryColor,
+      secondary: accentBlue,
+
       surface: backgroundWhite,
       background: backgroundLighter,
     ),
@@ -82,10 +82,8 @@ class AppTheme {
     appBarTheme: AppBarTheme(
       backgroundColor: appBarColor,
       elevation: 0,
-      titleTextStyle: textTheme.displayMedium?.copyWith(
-        color: Colors.white,
-      ),
-      iconTheme: const IconThemeData(color: Colors.white), 
+      titleTextStyle: textTheme.displayMedium?.copyWith(color: Colors.white),
+      iconTheme: const IconThemeData(color: Colors.white),
     ),
 
     inputDecorationTheme: InputDecorationTheme(
