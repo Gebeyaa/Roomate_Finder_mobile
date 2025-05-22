@@ -78,7 +78,6 @@ class _SignupScreenState extends State<SignupScreen> {
                 TextFormField(
                   controller: _emailController,
                   decoration: InputDecoration(
-                    hintText: "Enter your full name",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -107,7 +106,6 @@ class _SignupScreenState extends State<SignupScreen> {
                 TextFormField(
                   controller: _usernameController,
                   decoration: InputDecoration(
-                    hintText: "Enter your email",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -140,7 +138,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: _passwordController,
                   obscureText: !_isPasswordVisible,
                   decoration: InputDecoration(
-                    hintText: "Enter your password",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -196,7 +193,6 @@ class _SignupScreenState extends State<SignupScreen> {
                   controller: _confirmPasswordController,
                   obscureText: !_isConfirmPasswordVisible,
                   decoration: InputDecoration(
-                    hintText: "Confirm your password",
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
@@ -271,7 +267,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 60, 219, 240),
+                    backgroundColor: const Color.fromARGB(255, 60, 108, 240),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -295,20 +291,21 @@ class _SignupScreenState extends State<SignupScreen> {
                     children: const [
                       TextSpan(
                         text: "By clicking on Sign up, you agree to our ",
+                        style: TextStyle(
+                          color: Color.fromARGB(255, 219, 171, 171),
+                        ),
                       ),
                       TextSpan(
                         text: "Terms of service",
                         style: TextStyle(
-                          color: const Color.fromARGB(255, 60, 219, 240),
-                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(255, 219, 171, 171),
                         ),
                       ),
                       TextSpan(text: " and\n"),
                       TextSpan(
                         text: "Privacy policy",
                         style: TextStyle(
-                          color: const Color.fromARGB(255, 60, 219, 240),
-                          fontWeight: FontWeight.bold,
+                          color: Color.fromARGB(255, 219, 171, 171),
                         ),
                       ),
                     ],
@@ -320,7 +317,9 @@ class _SignupScreenState extends State<SignupScreen> {
                   children: [
                     Text(
                       "Already have an account? ",
-                      style: TextStyle(color: Colors.grey[600]),
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 219, 171, 171),
+                      ),
                     ),
                     GestureDetector(
                       onTap: () {
@@ -329,7 +328,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       child: Text(
                         "Sign in",
                         style: TextStyle(
-                          color: const Color.fromARGB(255, 60, 219, 240),
+                          color: const Color.fromARGB(255, 63, 60, 240),
                           fontWeight: FontWeight.bold,
                         ),
                       ),

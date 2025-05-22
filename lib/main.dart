@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       title: 'Arhibu',
-      initialRoute: RouteNames.accountsetup,
+      initialRoute: RouteNames.getstarted,
       onGenerateRoute: AppRouter.generateRoute,
       theme: AppTheme.lightTheme,
     );

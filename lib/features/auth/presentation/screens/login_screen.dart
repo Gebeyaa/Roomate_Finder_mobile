@@ -36,7 +36,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // leading: Image.asset('images/arhibu.jpg', width: 50, height: 50),
+        leading: Image.asset('images/Logowhite.png', width: 50, height: 50),
         automaticallyImplyLeading: false,
         title: const Text("Arhibu"),
         centerTitle: true,
@@ -137,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: AppTheme.secondaryColor,
+                    backgroundColor: AppTheme.appBarColor,
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),

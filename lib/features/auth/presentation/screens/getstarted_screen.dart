@@ -12,33 +12,24 @@ class _GetstartedScreenState extends State<GetstartedScreen> {
   int _currentPage = 0;
 
   final List<Map<String, String>> _pages = [
+    {'title': 'Roommates', 'background': 'images/home.png'},
     {
-      'title': 'Roomates',
-      // 'desc':
-      //     'Welcome to Arhibu, the easiest way to find and connect with compatible roommates. Start your journey to a better living experience!',
-    },
-    {
-      'image': 'images/logo.jpg',
+      'image': 'images/home1.png',
       'title': 'Find Your compatible Roommate',
       'desc':
           'Browse profiles, filter by preferences, and discover people who match your lifestyle and needs.',
     },
     {
-      'image': 'images/arhibu.jpg',
+      'image': 'images/home1.png',
       'title': 'Choose yours from multiple options.',
       'desc':
           'Message potential roommates securely within the app and get to know them before making a decision.',
     },
     {
-      'image': 'images/arhibu.jpg',
+      'image': 'images/home2.png',
       'title': 'Meet the user which you verfied.',
       'desc':
           'All users are verified for your safety and peace of mind. Find trustworthy roommates with confidence.',
-    },
-    {
-      'title': 'Get Started Now!',
-      'desc':
-          'Sign up and join the Arhibu community to find your ideal roommate today!',
     },
   ];
 
@@ -55,56 +46,251 @@ class _GetstartedScreenState extends State<GetstartedScreen> {
         child: Column(
           children: [
             Expanded(
-              child: Stack(
-                children: [
-                  PageView.builder(
-                    controller: _pageController,
-                    itemCount: _pages.length,
-                    onPageChanged: (index) {
-                      setState(() {
-                        _currentPage = index;
-                      });
-                    },
-                    itemBuilder: (context, index) {
-                      final page = _pages[index];
-                      return Padding(
-                        padding: const EdgeInsets.all(24.0),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (page['image'] != null &&
-                                page['image']!.isNotEmpty)
-                              Image.asset(page['image']!, height: 200),
-                            if (page['image'] != null &&
-                                page['image']!.isNotEmpty)
-                              const SizedBox(height: 40),
-                            if (page['title'] != null &&
-                                page['title']!.isNotEmpty)
+              child: PageView.builder(
+                controller: _pageController,
+                itemCount: _pages.length,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentPage = index;
+                  });
+                },
+                itemBuilder: (context, index) {
+                  final page = _pages[index];
+                  if (index == 0) {
+                    return Stack(
+                      fit: StackFit.expand,
+                      children: [
+                        Image.asset('images/home.png', fit: BoxFit.cover),
+                        Container(color: Colors.black.withOpacity(0.2)),
+                        Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
                               Text(
                                 page['title']!,
                                 style: const TextStyle(
-                                  fontSize: 28,
+                                  fontSize: 36,
                                   fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                  shadows: [
+                                    Shadow(
+                                      blurRadius: 10,
+                                      color: Colors.black,
+                                      offset: Offset(2, 2),
+                                    ),
+                                  ],
                                 ),
                                 textAlign: TextAlign.center,
                               ),
-                            const SizedBox(height: 20),
-                            if (page['desc'] != null &&
-                                page['desc']!.isNotEmpty)
-                              Text(
-                                page['desc']!,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  color: Colors.grey,
-                                ),
-                                textAlign: TextAlign.center,
-                              ),
-                          ],
+                              const SizedBox(height: 24),
+                              Image.asset('images/Logowhite.png', height: 80),
+                            ],
+                          ),
                         ),
-                      );
-                    },
-                  ),
-                ],
+                      ],
+                    );
+                  }
+
+                  if (index == 1) {
+                    return Container(
+                      color: Colors.blue,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (page['image'] != null &&
+                              page['image']!.isNotEmpty)
+                            Image.asset(page['image']!, height: 200),
+                          if (page['image'] != null &&
+                              page['image']!.isNotEmpty)
+                            const SizedBox(height: 150),
+                          Expanded(
+                            child: Container(
+                              width: double.infinity,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 32,
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  if (page['title'] != null &&
+                                      page['title']!.isNotEmpty)
+                                    Text(
+                                      page['title']!,
+                                      style: const TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  const SizedBox(height: 20),
+                                  if (page['desc'] != null &&
+                                      page['desc']!.isNotEmpty)
+                                    Text(
+                                      page['desc']!,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  if (index == 2) {
+                    return Container(
+                      color: Colors.blue,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (page['image'] != null &&
+                              page['image']!.isNotEmpty)
+                            Image.asset(page['image']!, height: 200),
+                          if (page['image'] != null &&
+                              page['image']!.isNotEmpty)
+                            const SizedBox(height: 150),
+                          Expanded(
+                            child: Container(
+                              width: double.infinity,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 32,
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  if (page['title'] != null &&
+                                      page['title']!.isNotEmpty)
+                                    Text(
+                                      page['title']!,
+                                      style: const TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  const SizedBox(height: 20),
+                                  if (page['desc'] != null &&
+                                      page['desc']!.isNotEmpty)
+                                    Text(
+                                      page['desc']!,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  if (index == 3) {
+                    return Container(
+                      color: Colors.blue,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          if (page['image'] != null &&
+                              page['image']!.isNotEmpty)
+                            Image.asset(page['image']!, height: 200),
+                          if (page['image'] != null &&
+                              page['image']!.isNotEmpty)
+                            const SizedBox(height: 150),
+                          Expanded(
+                            child: Container(
+                              width: double.infinity,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                              ),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 24,
+                                vertical: 32,
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.start,
+                                children: [
+                                  if (page['title'] != null &&
+                                      page['title']!.isNotEmpty)
+                                    Text(
+                                      page['title']!,
+                                      style: const TextStyle(
+                                        fontSize: 24,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.black,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                  const SizedBox(height: 20),
+                                  if (page['desc'] != null &&
+                                      page['desc']!.isNotEmpty)
+                                    Text(
+                                      page['desc']!,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey,
+                                      ),
+                                      textAlign: TextAlign.center,
+                                    ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+
+                  return Padding(
+                    padding: const EdgeInsets.all(24.0),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        if (page['image'] != null && page['image']!.isNotEmpty)
+                          Image.asset(page['image']!, height: 200),
+                        if (page['image'] != null && page['image']!.isNotEmpty)
+                          const SizedBox(height: 40),
+                        if (page['title'] != null && page['title']!.isNotEmpty)
+                          Text(
+                            page['title']!,
+                            style: const TextStyle(
+                              fontSize: 28,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        const SizedBox(height: 20),
+                        if (page['desc'] != null && page['desc']!.isNotEmpty)
+                          Text(
+                            page['desc']!,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ),
             Row(
