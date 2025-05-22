@@ -38,7 +38,7 @@ class _SignupScreenState extends State<SignupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        // leading: Image.asset('images/arhibu.jpg', width: 50, height: 50),
+        leading: Image.asset('images/Logowhite.png', width: 50, height: 50),
         automaticallyImplyLeading: false,
         title: const Text("Arhibu"),
         centerTitle: true,
