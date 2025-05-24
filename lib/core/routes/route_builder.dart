@@ -4,7 +4,9 @@ import 'package:arhibu/features/auth/presentation/bloc/login_bloc.dart';
 import 'package:arhibu/features/auth/presentation/bloc/signup_bloc.dart';
 import 'package:arhibu/features/auth/presentation/screens/getstarted_screen.dart';
 import 'package:arhibu/features/auth/presentation/screens/login_screen.dart';
+import 'package:arhibu/features/auth/presentation/screens/open_email_screen.dart';
 import 'package:arhibu/features/auth/presentation/screens/signup_screen.dart';
+import 'package:arhibu/features/auth/presentation/screens/verification_screen.dart';
 import 'package:arhibu/features/home/presentation/screens/home_page_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -40,6 +42,11 @@ class RouteBuilder {
             create: (context) => AccountSetupBloc(),
             child: const AccountSetUp(),
           ),
+      RouteNames.openemail:
+          (context) => OpenEmailScreen(email: 'user@example.com'),
+
+      RouteNames.verify:
+          (context) => EmailVerificationScreen(email: 'user@example.com'),
     };
   }
 }

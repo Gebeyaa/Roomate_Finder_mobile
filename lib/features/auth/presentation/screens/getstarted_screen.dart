@@ -63,28 +63,30 @@ class _GetstartedScreenState extends State<GetstartedScreen> {
                         Image.asset('images/home.png', fit: BoxFit.cover),
                         Container(color: Colors.black.withOpacity(0.2)),
                         Center(
-                          child: Column(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              Text(
-                                page['title']!,
-                                style: const TextStyle(
-                                  fontSize: 36,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
-                                  shadows: [
-                                    Shadow(
-                                      blurRadius: 10,
-                                      color: Colors.black,
-                                      offset: Offset(2, 2),
-                                    ),
-                                  ],
+                          child: SingleChildScrollView(
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Text(
+                                  page['title']!,
+                                  style: const TextStyle(
+                                    fontSize: 36,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                    shadows: [
+                                      Shadow(
+                                        blurRadius: 10,
+                                        color: Colors.black,
+                                        offset: Offset(2, 2),
+                                      ),
+                                    ],
+                                  ),
+                                  textAlign: TextAlign.center,
                                 ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 24),
-                              Image.asset('images/Logowhite.png', height: 80),
-                            ],
+                                const SizedBox(height: 24),
+                                Image.asset('images/Logowhite.png', height: 80),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -94,55 +96,57 @@ class _GetstartedScreenState extends State<GetstartedScreen> {
                   if (index == 1) {
                     return Container(
                       color: Colors.blue,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (page['image'] != null &&
-                              page['image']!.isNotEmpty)
-                            Image.asset(page['image']!, height: 200),
-                          if (page['image'] != null &&
-                              page['image']!.isNotEmpty)
-                            const SizedBox(height: 150),
-                          Expanded(
-                            child: Container(
-                              width: double.infinity,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 32,
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  if (page['title'] != null &&
-                                      page['title']!.isNotEmpty)
-                                    Text(
-                                      page['title']!,
-                                      style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (page['image'] != null &&
+                                page['image']!.isNotEmpty)
+                              Image.asset(page['image']!, height: 200),
+                            if (page['image'] != null &&
+                                page['image']!.isNotEmpty)
+                              const SizedBox(height: 150),
+                            Expanded(
+                              child: Container(
+                                width: double.infinity,
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 32,
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    if (page['title'] != null &&
+                                        page['title']!.isNotEmpty)
+                                      Text(
+                                        page['title']!,
+                                        style: const TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                        textAlign: TextAlign.center,
                                       ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  const SizedBox(height: 20),
-                                  if (page['desc'] != null &&
-                                      page['desc']!.isNotEmpty)
-                                    Text(
-                                      page['desc']!,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey,
+                                    const SizedBox(height: 20),
+                                    if (page['desc'] != null &&
+                                        page['desc']!.isNotEmpty)
+                                      Text(
+                                        page['desc']!,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey,
+                                        ),
+                                        textAlign: TextAlign.center,
                                       ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     );
                   }
@@ -150,55 +154,57 @@ class _GetstartedScreenState extends State<GetstartedScreen> {
                   if (index == 2) {
                     return Container(
                       color: Colors.blue,
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          if (page['image'] != null &&
-                              page['image']!.isNotEmpty)
-                            Image.asset(page['image']!, height: 200),
-                          if (page['image'] != null &&
-                              page['image']!.isNotEmpty)
-                            const SizedBox(height: 150),
-                          Expanded(
-                            child: Container(
-                              width: double.infinity,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 32,
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                children: [
-                                  if (page['title'] != null &&
-                                      page['title']!.isNotEmpty)
-                                    Text(
-                                      page['title']!,
-                                      style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            if (page['image'] != null &&
+                                page['image']!.isNotEmpty)
+                              Image.asset(page['image']!, height: 200),
+                            if (page['image'] != null &&
+                                page['image']!.isNotEmpty)
+                              const SizedBox(height: 150),
+                            Expanded(
+                              child: Container(
+                                width: double.infinity,
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 24,
+                                  vertical: 32,
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    if (page['title'] != null &&
+                                        page['title']!.isNotEmpty)
+                                      Text(
+                                        page['title']!,
+                                        style: const TextStyle(
+                                          fontSize: 24,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.black,
+                                        ),
+                                        textAlign: TextAlign.center,
                                       ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  const SizedBox(height: 20),
-                                  if (page['desc'] != null &&
-                                      page['desc']!.isNotEmpty)
-                                    Text(
-                                      page['desc']!,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey,
+                                    const SizedBox(height: 20),
+                                    if (page['desc'] != null &&
+                                        page['desc']!.isNotEmpty)
+                                      Text(
+                                        page['desc']!,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.grey,
+                                        ),
+                                        textAlign: TextAlign.center,
                                       ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     );
                   }

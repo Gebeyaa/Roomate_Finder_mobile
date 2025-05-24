@@ -244,7 +244,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             content: Text('Registration successful.'),
                           ),
                         );
-                        Navigator.pushReplacementNamed(context, '/login');
+                        Navigator.pushReplacementNamed(context, '/openemail');
                       } else {
                         String errorMsg =
                             result.errorMessage ?? 'Registration failed.';
