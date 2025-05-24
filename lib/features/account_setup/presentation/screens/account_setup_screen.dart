@@ -94,25 +94,25 @@ class _AccountSetUpState extends State<AccountSetUp> {
                         children: [
                           _buildStepIndicator(
                             1,
-                            "Step1",
+                            "",
                             isActive: _currentStep >= 0,
                           ),
                           _buildStepConnector(isActive: _currentStep >= 1),
                           _buildStepIndicator(
                             2,
-                            "Step2",
+                            "",
                             isActive: _currentStep >= 1,
                           ),
                           _buildStepConnector(isActive: _currentStep >= 2),
                           _buildStepIndicator(
                             3,
-                            "Step3",
+                            "",
                             isActive: _currentStep >= 2,
                           ),
                           _buildStepConnector(isActive: _currentStep >= 3),
                           _buildStepIndicator(
                             4,
-                            "Step4",
+                            "",
                             isActive: _currentStep >= 3,
                           ),
                         ],

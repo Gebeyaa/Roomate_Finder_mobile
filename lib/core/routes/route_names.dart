@@ -6,5 +6,7 @@ abstract class RouteNames {
   static const String getstarted = '/getstarted';
   static const String profile = '/profile';
   static const String step2 = '/step2';
+  static const String openemail = '/openemail';
+  static const String verify = '/verify';
   
 }
