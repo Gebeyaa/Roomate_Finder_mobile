@@ -8,8 +8,7 @@ class SignupBloc extends Bloc<SignupEvent, SignupState> {
   @override
   Stream<SignupState> mapEventToState(SignupEvent event) async* {
     if (event is SignupSubmitted) {
-      // Simulate a signup process
-      await Future.delayed(Duration(seconds: 2)); // Simulating network delay
+      await Future.delayed(Duration(seconds: 2));
 
       if (event.email.isNotEmpty && event.password.length >= 6) {
         yield SignupSuccess("Signup successful!");

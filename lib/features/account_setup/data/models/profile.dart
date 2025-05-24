@@ -1,4 +1,4 @@
-import '../../domain/entities/template_entitiy.dart';
+import '../../domain/entities/profile_entitiy.dart';
 
 class TemplateModel extends TemplateEntity {
   TemplateModel();

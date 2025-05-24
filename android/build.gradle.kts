@@ -1,3 +1,29 @@
+plugins {
+    id("com.android.application")
+    kotlin("android")
+}
+
+android {
+    compileSdk = 33
+
+    ndkVersion = "29.0.13113456"
+
+    defaultConfig {
+        applicationId = "com.example.arhibu"
+        minSdk = 21
+        targetSdk = 33
+        versionCode = 1
+        versionName = "1.0"
+    }
+
+    buildTypes {
+        getByName("release") {
+            isMinifyEnabled = false
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
+        }
+    }
+}
+
 allprojects {
     repositories {
         google()
