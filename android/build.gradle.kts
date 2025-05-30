@@ -1,47 +1,33 @@
-plugins {
-    id("com.android.application")
-    kotlin("android")
-}
-
-android {
-    compileSdk = 33
-
-    ndkVersion = "29.0.13113456"
-
-    defaultConfig {
-        applicationId = "com.example.arhibu"
-        minSdk = 21
-        targetSdk = 33
-        versionCode = 1
-        versionName = "1.0"
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
     }
-
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
+    dependencies {
+        classpath("com.android.tools.build:gradle:8.2.1") // ✅ Update
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.22") // ✅ Update
     }
 }
 
 allprojects {
     repositories {
         google()
-        mavenCentral()
+        mavenCentral() 
     }
 }
 
-val newBuildDir: Directory = rootProject.layout.buildDirectory.dir("../../build").get()
-rootProject.layout.buildDirectory.value(newBuildDir)
+// Configure build directory for all projects
+rootProject.layout.buildDirectory.set(rootProject.layout.projectDirectory.dir("build"))
 
 subprojects {
-    val newSubprojectBuildDir: Directory = newBuildDir.dir(project.name)
-    project.layout.buildDirectory.value(newSubprojectBuildDir)
-}
-subprojects {
-    project.evaluationDependsOn(":app")
+    project.layout.buildDirectory.set(rootProject.layout.buildDirectory.dir(project.name))
 }
 
-tasks.register<Delete>("clean") {
-    delete(rootProject.layout.buildDirectory)
-}
+// Optional: configure custom build directory (be cautious!)
+// rootProject.layout.buildDirectory.set(rootProject.layout.projectDirectory.dir("../build"))
+
+// subprojects {
+//     project.layout.buildDirectory.set(rootProject.layout.buildDirectory.dir(project.name))
+// }
+
+

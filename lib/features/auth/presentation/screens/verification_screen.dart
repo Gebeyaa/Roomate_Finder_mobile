@@ -143,7 +143,7 @@ class _EmailVerificationScreenState extends State<EmailVerificationScreen> {
                   ),
                 ),
                 onPressed: () {
-                  
+                  Navigator.pushNamed(context, '/accountsetup');
                 },
                 child: const Text(
                   'Continue',

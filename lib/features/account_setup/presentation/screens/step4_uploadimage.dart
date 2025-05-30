@@ -1,6 +1,9 @@
+import 'dart:io';
+
 import 'package:arhibu/features/account_setup/presentation/cubit/profile_setup_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
 
 class Step4UploadImage extends StatefulWidget {
   final VoidCallback onNext;
@@ -12,8 +15,23 @@ class Step4UploadImage extends StatefulWidget {
 }
 
 class _Step4UploadImageState extends State<Step4UploadImage> {
-  final List<String> _uploadedImages = [];
+  final List<File> _uploadedImages = [];
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  File? _selectedImage;
+
+  Future<void> _pickImage() async {
+    final picker = ImagePicker();
+    final picked = await picker.pickImage(source: ImageSource.gallery);
+    if (picked != null) {
+      final file = File(picked.path);
+      setState(() {
+        if (_uploadedImages.length < 6) {
+          _uploadedImages.add(file);
+          _selectedImage = file;
+        }
+      });
+    }
+  }
 
   void _submitForm(BuildContext context) {
     if (_formKey.currentState!.validate()) {
@@ -34,66 +52,67 @@ class _Step4UploadImageState extends State<Step4UploadImage> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             const Text(
-              "Step 4/5",
+              "Upload profile images",
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: Color.fromARGB(255, 73, 27, 27),
+              ),
+            ),
+            const SizedBox(height: 4),
+            const Text(
+              "You can upload a minimum of 1 and maximum of 6 pictures.",
+              style: TextStyle(fontSize: 14, color: Colors.grey),
+            ),
+            const SizedBox(height: 8),
+            const Divider(color: Colors.grey, thickness: 1, height: 20),
+            const SizedBox(height: 32),
+
+            GestureDetector(
+              onTap: _pickImage,
+              child: Container(
+                width: double.infinity,
+                height: 200,
+                decoration: BoxDecoration(
+                  border: Border.all(color: Colors.grey.withOpacity(0.3)),
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.grey[100],
+                ),
+
+                child:
+                    _selectedImage == null
+                        ? Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(
+                              Icons.cloud_upload_outlined,
+                              size: 48,
+                              color: Colors.blue.withOpacity(0.6),
+                            ),
+                            const SizedBox(height: 12),
+                            const Text(
+                              "Tap here to upload your profile images.",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.grey,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                          ],
+                        )
+                        : ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.file(
+                            _selectedImage!,
+                            width: double.infinity,
+                            height: 200,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
               ),
             ),
             const SizedBox(height: 24),
 
-            const Text(
-              "Upload ID for Verification",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            const Divider(color: Colors.grey, thickness: 1, height: 20),
-            const SizedBox(height: 16),
-            const Text(
-              "Upload clear photos of your government-issued ID for verification",
-              style: TextStyle(fontSize: 16, color: Colors.grey),
-            ),
-            const SizedBox(height: 32),
-            GestureDetector(
-              onTap: () {
-                setState(() {
-                  if (_uploadedImages.length < 6) {
-                    _uploadedImages.add(
-                      "placeholder_${_uploadedImages.length}",
-                    );
-                  }
-                });
-              },
-              child: Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(vertical: 40),
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.withOpacity(0.3)),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  children: [
-                    Icon(
-                      Icons.cloud_upload,
-                      size: 48,
-                      color: Colors.blue.withOpacity(0.6),
-                    ),
-                    const SizedBox(height: 12),
-                    const Text(
-                      "Tap to upload ID photos",
-                      style: TextStyle(fontSize: 16, color: Colors.grey),
-                    ),
-                    const SizedBox(height: 4),
-                    const Text(
-                      "(Max 6 photos)",
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            const SizedBox(height: 24),
             if (_uploadedImages.isNotEmpty) ...[
               GridView.builder(
                 shrinkWrap: true,
@@ -106,28 +125,35 @@ class _Step4UploadImageState extends State<Step4UploadImage> {
                 ),
                 itemCount: _uploadedImages.length,
                 itemBuilder: (context, index) {
+                  final file = _uploadedImages[index];
                   return Stack(
                     children: [
-                      Container(
-                        decoration: BoxDecoration(
-                          color: Colors.grey[100],
-                          borderRadius: BorderRadius.circular(8),
-                          border: Border.all(color: Colors.grey[300]!),
-                        ),
-                        child: Center(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              const Icon(
-                                Icons.photo,
-                                size: 30,
-                                color: Colors.grey,
-                              ),
-                              Text(
-                                "ID ${index + 1}",
-                                style: const TextStyle(color: Colors.grey),
-                              ),
-                            ],
+                      GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedImage = file;
+                          });
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: Colors.grey[100],
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color:
+                                  _selectedImage == file
+                                      ? Colors.blue
+                                      : Colors.grey[300]!,
+                              width: _selectedImage == file ? 2 : 1,
+                            ),
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(8),
+                            child: Image.file(
+                              file,
+                              fit: BoxFit.cover,
+                              width: double.infinity,
+                              height: double.infinity,
+                            ),
                           ),
                         ),
                       ),
@@ -136,9 +162,12 @@ class _Step4UploadImageState extends State<Step4UploadImage> {
                         right: 4,
                         child: GestureDetector(
                           onTap:
-                              () => setState(
-                                () => _uploadedImages.removeAt(index),
-                              ),
+                              () => setState(() {
+                                if (_selectedImage == file) {
+                                  _selectedImage = null;
+                                }
+                                _uploadedImages.removeAt(index);
+                              }),
                           child: Container(
                             padding: const EdgeInsets.all(4),
                             decoration: BoxDecoration(
@@ -166,10 +195,10 @@ class _Step4UploadImageState extends State<Step4UploadImage> {
             ],
 
             ElevatedButton(
-              onPressed:
-                  _uploadedImages.isNotEmpty
-                      ? () => _submitForm(context)
-                      : null,
+              onPressed: () {
+                Navigator.pushReplacementNamed(context, '/');
+                _uploadedImages.isNotEmpty ? () => _submitForm(context) : null;
+              },
               style: ElevatedButton.styleFrom(
                 backgroundColor:
                     _uploadedImages.isNotEmpty ? Colors.blue : Colors.grey[400],
