@@ -93,171 +93,59 @@ class _GetstartedScreenState extends State<GetstartedScreen> {
                     );
                   }
 
-                  if (index == 1) {
-                    return Container(
-                      color: Colors.blue,
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (page['image'] != null &&
-                                page['image']!.isNotEmpty)
-                              Image.asset(page['image']!, height: 200),
-                            if (page['image'] != null &&
-                                page['image']!.isNotEmpty)
-                              const SizedBox(height: 150),
-                            Expanded(
-                              child: Container(
-                                width: double.infinity,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                  vertical: 32,
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    if (page['title'] != null &&
-                                        page['title']!.isNotEmpty)
-                                      Text(
-                                        page['title']!,
-                                        style: const TextStyle(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    const SizedBox(height: 20),
-                                    if (page['desc'] != null &&
-                                        page['desc']!.isNotEmpty)
-                                      Text(
-                                        page['desc']!,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }
-
-                  if (index == 2) {
-                    return Container(
-                      color: Colors.blue,
-                      child: SingleChildScrollView(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            if (page['image'] != null &&
-                                page['image']!.isNotEmpty)
-                              Image.asset(page['image']!, height: 200),
-                            if (page['image'] != null &&
-                                page['image']!.isNotEmpty)
-                              const SizedBox(height: 150),
-                            Expanded(
-                              child: Container(
-                                width: double.infinity,
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                ),
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                  vertical: 32,
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    if (page['title'] != null &&
-                                        page['title']!.isNotEmpty)
-                                      Text(
-                                        page['title']!,
-                                        style: const TextStyle(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.black,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                    const SizedBox(height: 20),
-                                    if (page['desc'] != null &&
-                                        page['desc']!.isNotEmpty)
-                                      Text(
-                                        page['desc']!,
-                                        style: const TextStyle(
-                                          fontSize: 14,
-                                          color: Colors.grey,
-                                        ),
-                                        textAlign: TextAlign.center,
-                                      ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    );
-                  }
-
-                  if (index == 3) {
+                  if (index == 1 || index == 2 || index == 3) {
                     return Container(
                       color: Colors.blue,
                       child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          if (page['image'] != null &&
-                              page['image']!.isNotEmpty)
-                            Image.asset(page['image']!, height: 200),
-                          if (page['image'] != null &&
-                              page['image']!.isNotEmpty)
-                            const SizedBox(height: 150),
                           Expanded(
-                            child: Container(
-                              width: double.infinity,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                              ),
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 24,
-                                vertical: 32,
-                              ),
+                            child: SingleChildScrollView(
                               child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
                                 children: [
-                                  if (page['title'] != null &&
-                                      page['title']!.isNotEmpty)
-                                    Text(
-                                      page['title']!,
-                                      style: const TextStyle(
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.black,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
-                                  const SizedBox(height: 20),
-                                  if (page['desc'] != null &&
-                                      page['desc']!.isNotEmpty)
-                                    Text(
-                                      page['desc']!,
-                                      style: const TextStyle(
-                                        fontSize: 14,
-                                        color: Colors.grey,
-                                      ),
-                                      textAlign: TextAlign.center,
-                                    ),
+                                  if (page['image'] != null &&
+                                      page['image']!.isNotEmpty)
+                                    Image.asset(page['image']!, height: 200),
                                 ],
                               ),
+                            ),
+                          ),
+                          Container(
+                            width: double.infinity,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                            ),
+                            padding: const EdgeInsets.only(
+                              left: 24,
+                              right: 24,
+                              top: 32,
+                              bottom: 80,
+                            ),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                if (page['title'] != null &&
+                                    page['title']!.isNotEmpty)
+                                  Text(
+                                    page['title']!,
+                                    style: const TextStyle(
+                                      fontSize: 24,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                                const SizedBox(height: 20),
+                                if (page['desc'] != null &&
+                                    page['desc']!.isNotEmpty)
+                                  Text(
+                                    page['desc']!,
+                                    style: const TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey,
+                                    ),
+                                    textAlign: TextAlign.center,
+                                  ),
+                              ],
                             ),
                           ),
                         ],

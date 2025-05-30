@@ -1,4 +1,3 @@
-import 'package:arhibu/core/theme/app_theme.dart';
 import 'package:arhibu/features/auth/data/datasources/user_remote_data_source.dart';
 import 'package:arhibu/features/auth/data/models/user_model.dart';
 import 'package:flutter/material.dart';
@@ -34,15 +33,29 @@ class _SignupScreenState extends State<SignupScreen> {
     super.dispose();
   }
 
+  void _showLoadingDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const Center(child: CircularProgressIndicator()),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: Image.asset('images/Logowhite.png', width: 50, height: 50),
+        backgroundColor: Colors.white,
+        leading: Image.asset(
+          'images/Logowhite.png',
+          width: 50,
+          height: 50,
+          color: const Color.fromARGB(255, 10, 89, 224),
+        ),
         automaticallyImplyLeading: false,
-        title: const Text("Arhibu"),
-        centerTitle: true,
+       
       ),
+
       body: BlocListener<SignupBloc, SignupState>(
         listener: (context, state) {
           if (state is SignupSuccess) {
@@ -65,22 +78,30 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 20),
                 Text(
                   "Sign up",
-                  style: AppTheme.textTheme.displayMedium,
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 73, 27, 27),
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 30),
 
                 Text(
-                  "Full name",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  "Full Name",
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: const Color.fromARGB(255, 139, 101, 114),
+                  ),
                 ),
                 const SizedBox(height: 5),
                 TextFormField(
-                  controller: _emailController,
+                  controller: _usernameController,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                    fillColor: Color.fromARGB(255, 240, 232, 235),
+
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 15,
                       vertical: 15,
@@ -98,17 +119,20 @@ class _SignupScreenState extends State<SignupScreen> {
                   },
                 ),
                 const SizedBox(height: 20),
+
                 Text(
                   "Email",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: const Color.fromARGB(255, 139, 101, 114),
+                  ),
                 ),
                 const SizedBox(height: 5),
                 TextFormField(
-                  controller: _usernameController,
+                  controller: _emailController,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                    fillColor: Color.fromARGB(255, 240, 232, 235),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 15,
                       vertical: 15,
@@ -128,19 +152,23 @@ class _SignupScreenState extends State<SignupScreen> {
                     return null;
                   },
                 ),
+
+
                 const SizedBox(height: 20),
                 Text(
                   "Password",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: const Color.fromARGB(255, 139, 101, 114),
+                  ),
                 ),
                 const SizedBox(height: 5),
                 TextFormField(
                   controller: _passwordController,
                   obscureText: !_isPasswordVisible,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                    fillColor: Color.fromARGB(255, 240, 232, 235),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 15,
                       vertical: 15,
@@ -183,19 +211,25 @@ class _SignupScreenState extends State<SignupScreen> {
                     return null;
                   },
                 ),
+
+
+
+                
                 const SizedBox(height: 20),
                 Text(
                   "Confirm Password",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    color: const Color.fromARGB(255, 139, 101, 114),
+                  ),
                 ),
                 const SizedBox(height: 5),
                 TextFormField(
                   controller: _confirmPasswordController,
                   obscureText: !_isConfirmPasswordVisible,
                   decoration: InputDecoration(
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                    ),
+                    fillColor: Color.fromARGB(255, 240, 232, 235),
                     contentPadding: const EdgeInsets.symmetric(
                       horizontal: 15,
                       vertical: 15,
@@ -230,6 +264,8 @@ class _SignupScreenState extends State<SignupScreen> {
                   onPressed: () async {
                     if (_formKey.currentState!.validate()) {
                       setState(() => isLoading = true);
+                      _showLoadingDialog(context); // Show loading indicator
+
                       final user = UserModel(
                         userName: _usernameController.text.trim(),
                         email: _emailController.text.trim(),
@@ -237,7 +273,13 @@ class _SignupScreenState extends State<SignupScreen> {
                       );
                       final api = RemoteDatasource();
                       final result = await api.register(user);
+
                       setState(() => isLoading = false);
+                      Navigator.of(
+                        context,
+                        rootNavigator: true,
+                      ).pop(); // Hide loading dialog
+
                       if (result.success) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -298,14 +340,14 @@ class _SignupScreenState extends State<SignupScreen> {
                       TextSpan(
                         text: "Terms of service",
                         style: TextStyle(
-                          color: Color.fromARGB(255, 219, 171, 171),
+                          color: Color.fromARGB(255, 219, 171, 199),
                         ),
                       ),
                       TextSpan(text: " and\n"),
                       TextSpan(
                         text: "Privacy policy",
                         style: TextStyle(
-                          color: Color.fromARGB(255, 219, 171, 171),
+                          color: Color.fromARGB(255, 219, 171, 193),
                         ),
                       ),
                     ],
@@ -328,7 +370,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       child: Text(
                         "Sign in",
                         style: TextStyle(
-                          color: const Color.fromARGB(255, 63, 60, 240),
+                          color: const Color.fromARGB(255, 10, 111, 186),
                           fontWeight: FontWeight.bold,
                         ),
                       ),

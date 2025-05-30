@@ -1,6 +1,7 @@
 import 'package:arhibu/features/account_setup/presentation/cubit/profile_setup_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 import 'step1_personalinfo.dart';
 import 'step2_location.dart';
@@ -38,7 +39,7 @@ class _AccountSetUpState extends State<AccountSetUp> {
           backgroundColor: Colors.white,
           leading: Padding(
             padding: const EdgeInsets.all(8.0),
-            child: Image.asset('images/realogo.png'),
+            child: SvgPicture.asset('images/Vector.svg'),
           ),
           actions: [
             Padding(
@@ -58,7 +59,7 @@ class _AccountSetUpState extends State<AccountSetUp> {
           ),
           child: SingleChildScrollView(
             child: Padding(
-              padding: const EdgeInsets.all(3.0),
+              padding: const EdgeInsets.all(5.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -91,30 +92,18 @@ class _AccountSetUpState extends State<AccountSetUp> {
                       ),
                       const SizedBox(height: 30),
                       Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          _buildStepIndicator(
-                            1,
-                            "",
-                            isActive: _currentStep >= 0,
-                          ),
-                          _buildStepConnector(isActive: _currentStep >= 1),
-                          _buildStepIndicator(
-                            2,
-                            "",
-                            isActive: _currentStep >= 1,
-                          ),
-                          _buildStepConnector(isActive: _currentStep >= 2),
-                          _buildStepIndicator(
-                            3,
-                            "",
-                            isActive: _currentStep >= 2,
-                          ),
-                          _buildStepConnector(isActive: _currentStep >= 3),
-                          _buildStepIndicator(
-                            4,
-                            "",
-                            isActive: _currentStep >= 3,
-                          ),
+                          for (int i = 0; i < 4; i++) ...[
+                            _buildStepIndicator(
+                              i == _currentStep
+                                  ? "step ${_currentStep + 1}/5"
+                                  : "",
+                              isActive: _currentStep >= i,
+                            ),
+                            if (i < 3)
+                              _buildStepConnector(isActive: _currentStep > i),
+                          ],
                         ],
                       ),
                     ],
@@ -139,6 +128,7 @@ class _AccountSetUpState extends State<AccountSetUp> {
                       children: [
                         if (_currentStep == 0)
                           Step1Personalinfo(onNext: _goToNextStep),
+
                         if (_currentStep == 1)
                           Step2Location(onNext: _goToNextStep),
                         if (_currentStep == 2)
@@ -157,48 +147,60 @@ class _AccountSetUpState extends State<AccountSetUp> {
     );
   }
 
-  Widget _buildStepIndicator(
-    int stepNumber,
-    String label, {
-    bool isActive = false,
-  }) {
+  Widget _buildStepIndicator(String label, {bool isActive = false}) {
     return Column(
       children: [
         Container(
-          width: 30,
-          height: 30,
+          width: 40,
+          height: 40,
           decoration: BoxDecoration(
-            color: isActive ? Colors.blue : Colors.grey[300],
+            color:
+                isActive
+                    ? const Color.fromARGB(236, 10, 138, 236)
+                    : Colors.white,
             shape: BoxShape.circle,
+            border: Border.all(
+              color:
+                  isActive
+                      ? const Color.fromARGB(204, 13, 72, 161)
+                      : const Color.fromARGB(255, 211, 209, 209),
+              width: 3,
+            ),
           ),
           child: Center(
             child: Text(
-              stepNumber.toString(),
+              "",
               style: TextStyle(
-                color: isActive ? Colors.white : Colors.grey[700],
+                color: isActive ? Colors.blue[900] : Colors.grey[700],
                 fontWeight: FontWeight.bold,
               ),
             ),
           ),
         ),
         const SizedBox(height: 8),
-        Text(
-          label,
-          style: TextStyle(
-            fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
-            color: isActive ? Colors.blue : Colors.grey,
+        if (label.isNotEmpty)
+          Text(
+            label,
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.blue),
           ),
-        ),
       ],
     );
   }
 
   Widget _buildStepConnector({bool isActive = false}) {
-    return Expanded(
-      child: Container(
-        height: 5,
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        color: isActive ? Colors.blue : Colors.grey[300],
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: List.generate(
+        6,
+        (index) => Container(
+          width: 5,
+          height: 5,
+          margin: const EdgeInsets.symmetric(horizontal: 2),
+          decoration: BoxDecoration(
+            color: isActive ? Colors.blue : Colors.grey[300],
+            shape: BoxShape.circle,
+          ),
+        ),
       ),
     );
   }

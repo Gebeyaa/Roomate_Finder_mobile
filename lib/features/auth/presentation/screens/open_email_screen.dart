@@ -78,6 +78,8 @@ class OpenEmailScreen extends StatelessWidget {
                         ),
                       ),
                       onPressed: () async {
+                        Navigator.pushReplacementNamed(context, '/verify');
+
                         final Uri emailLaunchUri = Uri(
                           scheme: 'mailto',
                           path: '',

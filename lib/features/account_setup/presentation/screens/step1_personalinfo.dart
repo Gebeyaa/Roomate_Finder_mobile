@@ -1,6 +1,7 @@
 import 'package:arhibu/features/account_setup/presentation/cubit/profile_setup_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl_phone_field/intl_phone_field.dart';
 
 class Step1Personalinfo extends StatefulWidget {
   final VoidCallback onNext;
@@ -14,6 +15,7 @@ class Step1Personalinfo extends StatefulWidget {
 class _Step1PersonalinfoState extends State<Step1Personalinfo> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _ageController = TextEditingController();
+  final TextEditingController _phonenumberController = TextEditingController();
   final TextEditingController _budgetController = TextEditingController();
   final TextEditingController _moveInDateController = TextEditingController();
   final TextEditingController _leaseDurationController =
@@ -23,25 +25,20 @@ class _Step1PersonalinfoState extends State<Step1Personalinfo> {
   final TextEditingController _aboutYouController = TextEditingController();
 
   String? _petsPerson;
-  String? _gender;
+  String? _gender = "Female";
   String? _offeringRoom;
   String? _selectedState = 'Addis Ababa';
+  String? _relationshipStatus = "Single";
 
   @override
   void initState() {
     super.initState();
-    // Initialize with default values
-    _budgetController.text = '3000 ETB';
-    _moveInDateController.text = 'January 2022';
-    _leaseDurationController.text = '6 Month';
-    _homeTownController.text = 'Addis Ababa';
-    _occupationController.text = 'Student';
-    _aboutYouController.text = 'Good Communication';
   }
 
   @override
   void dispose() {
     _ageController.dispose();
+    _phonenumberController.dispose();
     _budgetController.dispose();
     _moveInDateController.dispose();
     _leaseDurationController.dispose();
@@ -58,12 +55,14 @@ class _Step1PersonalinfoState extends State<Step1Personalinfo> {
         'state': _selectedState,
         'age': _ageController.text,
         'gender': _gender,
+        'phone': _phonenumberController.text,
         'offeringRoom': _offeringRoom,
         'budget': _budgetController.text,
         'moveInDate': _moveInDateController.text,
         'leaseDuration': _leaseDurationController.text,
         'petsPerson': _petsPerson,
         'occupation': _occupationController.text,
+        'relationship': _relationshipStatus,
         'homeTown': _homeTownController.text,
         'aboutYou': _aboutYouController.text,
       };
@@ -79,284 +78,331 @@ class _Step1PersonalinfoState extends State<Step1Personalinfo> {
     return Form(
       key: _formKey,
       child: SingleChildScrollView(
-        child: Column(
-          children: [
-            const Text(
-              "Personal Information",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              "Here you can tailor your search to the exact neighborhoods you want to live in",
-              style: TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 20),
-
-            // State dropdown
-            DropdownButtonFormField<String>(
-              decoration: const InputDecoration(
-                labelText: "State",
-                border: OutlineInputBorder(),
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            children: [
+              const Text(
+                "Personal Information",
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black87,
+                ),
               ),
-              value: _selectedState,
-              items:
-                  ['Addis Ababa', 'Oromia', 'Amhara', 'Tigray', 'SNNP']
-                      .map(
-                        (state) =>
-                            DropdownMenuItem(value: state, child: Text(state)),
-                      )
-                      .toList(),
-              onChanged: (value) {
-                setState(() {
-                  _selectedState = value;
-                });
-              },
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please select your state';
-                }
-                return null;
-              },
-            ),
+              const SizedBox(height: 24),
 
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: _ageController,
-                    decoration: const InputDecoration(
-                      labelText: "Age",
-                      border: OutlineInputBorder(),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Where are you looking for roommate?",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                     ),
+                    value: _selectedState,
+                    items:
+                        ['Addis Ababa', 'Oromia', 'Amhara', 'Tigray', 'SNNP']
+                            .map(
+                              (state) => DropdownMenuItem(
+                                value: state,
+                                child: Text(state),
+                              ),
+                            )
+                            .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _selectedState = value;
+                      });
+                    },
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please select your state';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Phone number",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 8),
+
+                  IntlPhoneField(
+                    decoration: InputDecoration(
+                      labelText: 'Phone Number',
+                      border: OutlineInputBorder(borderSide: BorderSide()),
+                    ),
+                    initialCountryCode: 'ET', // Ethiopia
+                    onChanged: (phone) {},
+                    validator: (phone) {
+                      if (phone == null || phone.number.isEmpty) {
+                        return 'Please enter your phone number';
+                      }
+                      // Ethiopian local numbers are 8 digits
+                      if (!RegExp(r'^\d{8}$').hasMatch(phone.number)) {
+                        return 'Enter 8 digit Ethiopian number';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Gender",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                    ),
+                    value: _gender,
+                    items:
+                        ['Male', 'Female', 'Other']
+                            .map(
+                              (gender) => DropdownMenuItem(
+                                value: gender,
+                                child: Text(gender),
+                              ),
+                            )
+                            .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _gender = value;
+                      });
+                    },
+
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please select your gender';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Age",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 8),
+
+                  TextFormField(
+                    controller: _ageController,
                     keyboardType: TextInputType.number,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                    ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please enter your age';
                       }
-                      if (int.tryParse(value) == null) {
+                      final age = int.tryParse(value);
+                      if (age == null) {
                         return 'Please enter a valid number';
                       }
+                      if (age < 18) {
+                        return 'You must be at least 18 years old';
+                      }
+                      if (age > 120) {
+                        return 'Please enter a valid age';
+                      }
                       return null;
                     },
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const Text("Gender", style: TextStyle(fontSize: 14)),
-                      Row(
-                        children: [
-                          Radio<String>(
-                            value: 'Female',
-                            groupValue: _gender,
-                            onChanged: (value) {
-                              setState(() {
-                                _gender = value;
-                              });
-                            },
-                          ),
-                          const Text("Female"),
-                          Radio<String>(
-                            value: 'Male',
-                            groupValue: _gender,
-                            onChanged: (value) {
-                              setState(() {
-                                _gender = value;
-                              });
-                            },
-                          ),
-                          const Text("Male"),
-                        ],
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Relationship status",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 8),
+                  DropdownButtonFormField<String>(
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
                       ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-            const Text(
-              "Are you offering a room for rent?",
-              style: TextStyle(fontSize: 16),
-            ),
-            Row(
-              children: [
-                Radio<String>(
-                  value: 'Yes',
-                  groupValue: _offeringRoom,
-                  onChanged: (value) {
-                    setState(() {
-                      _offeringRoom = value;
-                    });
-                  },
-                ),
-                const Text("Yes"),
-                const SizedBox(width: 20),
-                Radio<String>(
-                  value: 'No',
-                  groupValue: _offeringRoom,
-                  onChanged: (value) {
-                    setState(() {
-                      _offeringRoom = value;
-                    });
-                  },
-                ),
-                const Text("No"),
-              ],
-            ),
-            const SizedBox(height: 20),
-
-            TextFormField(
-              controller: _budgetController,
-              decoration: const InputDecoration(
-                labelText: "Maximum rent budget",
-                border: OutlineInputBorder(),
-              ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your budget';
-                }
-                return null;
-              },
-            ),
-
-            const SizedBox(height: 20),
-            Row(
-              children: [
-                Expanded(
-                  child: TextFormField(
-                    controller: _moveInDateController,
-                    decoration: const InputDecoration(
-                      fillColor: Color.fromARGB(255, 243, 234, 234),
-                      labelText: "Move in date",
-                      border: OutlineInputBorder(),
                     ),
+                    value: _relationshipStatus,
+                    items:
+                        ['Single', 'In relationship', 'Married']
+                            .map(
+                              (status) => DropdownMenuItem(
+                                value: status,
+                                child: Text(status),
+                              ),
+                            )
+                            .toList(),
+                    onChanged: (value) {
+                      setState(() {
+                        _relationshipStatus = value;
+                      });
+                    },
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter move-in date';
+                        return 'Please select your relationship status';
                       }
                       return null;
                     },
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: TextFormField(
-                    controller: _leaseDurationController,
-                    decoration: const InputDecoration(
-                      labelText: "Lease Duration",
-                      border: OutlineInputBorder(),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Occupation",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _occupationController,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {
-                        return 'Please enter lease duration';
+                        return 'Please enter your occupation';
                       }
                       return null;
                     },
                   ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-            const Text(
-              "Are you a pets person?",
-              style: TextStyle(fontSize: 16),
-            ),
-            Row(
-              children: [
-                Radio<String>(
-                  value: 'Yes',
-                  groupValue: _petsPerson,
-                  onChanged: (value) {
-                    setState(() {
-                      _petsPerson = value;
-                    });
-                  },
-                ),
-                const Text("Yes"),
-                const SizedBox(width: 20),
-                Radio<String>(
-                  value: 'No',
-                  groupValue: _petsPerson,
-                  onChanged: (value) {
-                    setState(() {
-                      _petsPerson = value;
-                    });
-                  },
-                ),
-                const Text("No"),
-              ],
-            ),
-
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: _occupationController,
-              decoration: const InputDecoration(
-                fillColor: Color.fromARGB(255, 243, 234, 234),
-                labelText: "Occupation",
-                border: OutlineInputBorder(),
+                ],
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your occupation';
-                }
-                return null;
-              },
-            ),
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            TextFormField(
-              controller: _homeTownController,
-              decoration: const InputDecoration(
-                fillColor: Color.fromARGB(255, 243, 234, 234),
-                labelText: "Home Town",
-                border: OutlineInputBorder(),
+              // Home town field
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Home Town",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _homeTownController,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 12,
+                      ),
+                    ),
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please enter your home town';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
               ),
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please enter your home town';
-                }
-                return null;
-              },
-            ),
+              const SizedBox(height: 20),
 
-            const SizedBox(height: 20),
-            TextFormField(
-              controller: _aboutYouController,
-              decoration: const InputDecoration(
-                fillColor: Color.fromARGB(255, 243, 234, 234),
-                labelText: "Brief Information about you",
-                border: OutlineInputBorder(),
-                hintText: "Tell us something about yourself",
+              // About you field
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Tell us something about yourself",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _aboutYouController,
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.grey[100],
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 16,
+                      ),
+                      hintText: "Write about yourself...",
+                    ),
+                    minLines: 4,
+                    maxLines: null,
+                    validator: (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Please tell us about yourself';
+                      }
+                      return null;
+                    },
+                  ),
+                ],
               ),
-              maxLines: 3,
-              validator: (value) {
-                if (value == null || value.isEmpty) {
-                  return 'Please tell us about yourself';
-                }
-                return null;
-              },
-            ),
+              const SizedBox(height: 30),
 
-            const SizedBox(height: 30),
-            Padding(
-              padding: const EdgeInsets.only(top: 24.0),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(vertical: 18),
-                  minimumSize: const Size(double.infinity, 50),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                  ),
+                  onPressed: () => _submitForm(context),
+                  child: const Text('Next', style: TextStyle(fontSize: 18)),
                 ),
-                onPressed: () => _submitForm(context),
-                child: const Text('Next'),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

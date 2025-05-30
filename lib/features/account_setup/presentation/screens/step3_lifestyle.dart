@@ -1,10 +1,10 @@
+import 'package:arhibu/features/account_setup/presentation/cubit/profile_setup_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:arhibu/features/account_setup/presentation/cubit/profile_setup_cubit.dart';
 
 class Step3Lifestyle extends StatefulWidget {
   final VoidCallback onNext;
-  
+
   const Step3Lifestyle({super.key, required this.onNext});
 
   @override
@@ -48,20 +48,13 @@ class _Step3LifestyleState extends State<Step3Lifestyle> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
-            // Step indicator
-            const Text(
-              "Step 3/5",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(height: 24),
-
             const Text(
               "Lifestyle Information",
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                fontSize: 20,
+                color: const Color.fromARGB(255, 73, 27, 27),
+                fontWeight: FontWeight.bold,
+              ),
             ),
             const SizedBox(height: 8),
             const Divider(color: Colors.grey, thickness: 1, height: 20),
@@ -80,7 +73,8 @@ class _Step3LifestyleState extends State<Step3Lifestyle> {
                   _cleanliness = value;
                 });
               },
-              validator: (value) => value == null ? 'Please select an option' : null,
+              validator:
+                  (value) => value == null ? 'Please select an option' : null,
             ),
             const SizedBox(height: 24),
 
@@ -98,7 +92,8 @@ class _Step3LifestyleState extends State<Step3Lifestyle> {
                   _workHours = value;
                 });
               },
-              validator: (value) => value == null ? 'Please select an option' : null,
+              validator:
+                  (value) => value == null ? 'Please select an option' : null,
             ),
             const SizedBox(height: 24),
 
@@ -116,12 +111,14 @@ class _Step3LifestyleState extends State<Step3Lifestyle> {
                   _sleepHours = value;
                 });
               },
-              validator: (value) => value == null ? 'Please select an option' : null,
+              validator:
+                  (value) => value == null ? 'Please select an option' : null,
             ),
             const SizedBox(height: 24),
 
             _buildQuestionDropdown(
-              question: "How would you describe your relationship with tobacco?",
+              question:
+                  "How would you describe your relationship with tobacco?",
               value: _tobaccoRelationship,
               items: const [
                 "Non-smoker",
@@ -134,12 +131,14 @@ class _Step3LifestyleState extends State<Step3Lifestyle> {
                   _tobaccoRelationship = value;
                 });
               },
-              validator: (value) => value == null ? 'Please select an option' : null,
+              validator:
+                  (value) => value == null ? 'Please select an option' : null,
             ),
             const SizedBox(height: 24),
 
             _buildQuestionDropdown(
-              question: "How would you describe your relationship with alcohol?",
+              question:
+                  "How would you describe your relationship with alcohol?",
               value: _alcoholRelationship,
               items: const [
                 "Non-drinker",
@@ -152,7 +151,8 @@ class _Step3LifestyleState extends State<Step3Lifestyle> {
                   _alcoholRelationship = value;
                 });
               },
-              validator: (value) => value == null ? 'Please select an option' : null,
+              validator:
+                  (value) => value == null ? 'Please select an option' : null,
             ),
             const SizedBox(height: 40),
 
@@ -191,16 +191,19 @@ class _Step3LifestyleState extends State<Step3Lifestyle> {
         DropdownButtonFormField<String>(
           value: value,
           decoration: InputDecoration(
-            border: const OutlineInputBorder(),
-            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
+            contentPadding: const EdgeInsets.symmetric(
+              horizontal: 12,
+              vertical: 16,
+            ),
           ),
           isExpanded: true,
-          items: items.map((String value) {
-            return DropdownMenuItem<String>(
-              value: value,
-              child: Text(value),
-            );
-          }).toList(),
+          items:
+              items.map((String value) {
+                return DropdownMenuItem<String>(
+                  value: value,
+                  child: Text(value),
+                );
+              }).toList(),
           onChanged: onChanged,
           validator: validator,
           hint: const Text("Select an option"),
