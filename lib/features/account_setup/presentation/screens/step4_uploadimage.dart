@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:arhibu/features/account_setup/presentation/cubit/profile_setup_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image_picker/image_picker.dart';
 
 class Step4UploadImage extends StatefulWidget {
@@ -24,6 +25,28 @@ class _Step4UploadImageState extends State<Step4UploadImage> {
     final picked = await picker.pickImage(source: ImageSource.gallery);
     if (picked != null) {
       final file = File(picked.path);
+
+      final inputImage = InputImage.fromFile(file);
+      final faceDetector = FaceDetector(
+        options: FaceDetectorOptions(
+          performanceMode: FaceDetectorMode.accurate,
+          enableLandmarks: true,
+          enableClassification: true,
+        ),
+      );
+      final faces = await faceDetector.processImage(inputImage);
+
+      if (faces.isEmpty) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'No human face detected! Please upload a clear photo of yourself.',
+            ),
+          ),
+        );
+        return;
+      }
+
       setState(() {
         if (_uploadedImages.length < 6) {
           _uploadedImages.add(file);

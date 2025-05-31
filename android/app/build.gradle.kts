@@ -24,6 +24,7 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+        multiDexEnabled = true
     }
 
     buildTypes {
@@ -34,6 +35,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            // Optional: use debug signing for now
             signingConfig = signingConfigs.getByName("debug")
         }
         getByName("debug") {
@@ -41,14 +43,6 @@ android {
             isShrinkResources = false
         }
     }
-
-    applicationVariants.all {
-    val variant = this
-    variant.outputs.all {
-        val output = this as com.android.build.gradle.internal.api.BaseVariantOutputImpl
-        output.outputFileName = "app-${variant.name}-${variant.versionName}.apk"
-    }
-}
 
     buildFeatures {
         buildConfig = true

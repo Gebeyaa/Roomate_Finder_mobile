@@ -1,8 +1,15 @@
-// ...existing imports...
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:arhibu/features/chat/presentation/screens/chat_detail_screen.dart';
 
+import '../../domain/entities/listing_entity.dart';
+import '../../domain/usecases/get_listings.dart';
+import '../bloc/listing_bloc.dart';
+import '../bloc/listing_event.dart';
+import '../bloc/listing_state.dart';
 import 'home_page_detail.dart';
+import 'search_screen.dart';
 
 class HomePageScreen extends StatefulWidget {
   const HomePageScreen({super.key});
@@ -12,139 +19,135 @@ class HomePageScreen extends StatefulWidget {
 }
 
 class _HomePageScreenState extends State<HomePageScreen> {
+  late ListingBloc _listingBloc;
+  bool _showSearchBar = false;
+  String _searchQuery = "";
+  List<ListingEntity> _allListings = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _listingBloc = ListingBloc(context.read<GetListings>());
+    _listingBloc.add(LoadListings());
+  }
+
+  @override
+  void dispose() {
+    _listingBloc.close();
+    super.dispose();
+  }
+
+  void _onSearchSubmitted(String value) {
+    if (value.trim().isNotEmpty && _allListings.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => SearchScreen(searchQuery: value, listings: _allListings),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-        leading: Padding(
-          padding: const EdgeInsets.all(8.0),
-          child: SizedBox(
-            width: 70,
-            height: 56,
+    return BlocProvider.value(
+      value: _listingBloc,
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+          leading: Padding(
+            padding: const EdgeInsets.all(8.0),
             child: SvgPicture.asset('images/Vector.svg', color: Colors.white),
           ),
+          title:
+              _showSearchBar
+                  ? TextField(
+                    autofocus: true,
+                    decoration: const InputDecoration(
+                      hintText: "Search listings...",
+                      border: InputBorder.none,
+                    ),
+                    onChanged: (value) {
+                      setState(() {
+                        _searchQuery = value;
+                      });
+                    },
+                    onSubmitted: _onSearchSubmitted,
+                    textInputAction: TextInputAction.search,
+                  )
+                  : const Text("Roommates"),
+          actions: [
+            if (!_showSearchBar)
+              Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: IconButton(
+                  icon: const Icon(Icons.search, size: 24),
+                  onPressed: () {
+                    setState(() {
+                      _showSearchBar = true;
+                    });
+                  },
+                ),
+              ),
+            if (_showSearchBar)
+              Padding(
+                padding: const EdgeInsets.only(right: 16.0),
+                child: IconButton(
+                  icon: const Icon(Icons.close, size: 24),
+                  onPressed: () {
+                    setState(() {
+                      _showSearchBar = false;
+                      _searchQuery = "";
+                    });
+                  },
+                ),
+              ),
+          ],
         ),
-        title: const Text("Roommates"),
-        actions: [
-          Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: Row(
-              children: [
-                Icon(Icons.search, size: 24),
-                const SizedBox(width: 16),
-              ],
-            ),
-          ),
-        ],
-      ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const SizedBox(height: 10),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16.0, 12.0, 16.0, 12.0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Color.fromARGB(255, 240, 232, 235),
-                borderRadius: BorderRadius.circular(16),
-              ),
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-              child: Row(
-                children: [
-                  Icon(Icons.location_on, size: 20, color: Colors.grey[600]),
-                  const SizedBox(width: 8),
-                  Text(
-                    "Addis Ababa, Ethiopia",
-                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          Divider(height: 1, color: Colors.grey[300]),
-          const SizedBox(height: 20),
-          Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              children: [
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const HomePageDetailScreen(),
-                      ),
-                    );
-                  },
-                  child: _buildRoommateCard(
-                    profile: "images/google.png",
-                    name: "Payal Patel",
-                    time: "30min ago",
-                    price: "3000",
-                    title: "2BHK for Rent in Paras Town Hall",
-                    description:
-                        "Spacious 2BHK available near Paras Town Hall. Close to metro, markets, and restaurants.",
-                    postImage: "images/telegram.png",
-                  ),
-                ),
-                GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const HomePageDetailScreen(),
-                      ),
-                    );
-                  },
-                  child: _buildRoommateCard(
-                    profile: "images/home2.png",
-                    name: "Rahul Rana",
-                    time: "30min ago",
-                    price: "3500",
-                    title: "Single Room in Shared Apartment",
-                    description:
-                        "Looking for a flatmate for a fully furnished apartment. All amenities included.",
-                    postImage: "images/home1.png",
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey[700],
-        backgroundColor: Colors.white,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat_outlined),
-            label: 'Chat',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.notifications_paused_outlined),
-            label: 'Notiifaction',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person_2_outlined),
-            label: 'Profile',
-          ),
-        ],
+        body: BlocBuilder<ListingBloc, ListingState>(
+          builder: (context, state) {
+            if (state is ListingLoading) {
+              return const Center(child: CircularProgressIndicator());
+            } else if (state is ListingLoaded) {
+              _allListings = state.listings;
+              final listings =
+                  state.listings.where((listing) {
+                    if (_searchQuery.isEmpty) return true;
+                    final query = _searchQuery.toLowerCase();
+                    return listing.title.toLowerCase().contains(query) ||
+                        listing.location.toLowerCase().contains(query) ||
+                        listing.description.toLowerCase().contains(query);
+                  }).toList();
+              return ListView.builder(
+                padding: const EdgeInsets.all(16),
+                itemCount: listings.length,
+                itemBuilder: (context, index) {
+                  final listing = listings[index];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder:
+                              (_) => HomePageDetailScreen(listing: listing),
+                        ),
+                      );
+                    },
+                    child: _buildRoommateCard(listing),
+                  );
+                },
+              );
+            } else if (state is ListingError) {
+              return Center(child: Text("Error: ${state.message}"));
+            }
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }
 
-  Widget _buildRoommateCard({
-    required String profile,
-    required String name,
-    required String time,
-    required String price,
-    required String title,
-    required String description,
-    required String postImage,
-  }) {
+  Widget _buildRoommateCard(ListingEntity listing) {
     return Card(
       elevation: 3,
       margin: const EdgeInsets.symmetric(vertical: 10),
@@ -155,30 +158,32 @@ class _HomePageScreenState extends State<HomePageScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
-              crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                CircleAvatar(radius: 28, backgroundImage: AssetImage(profile)),
+                const CircleAvatar(
+                  radius: 28,
+                  backgroundImage: AssetImage("images/home2.png"),
+                ),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        name,
+                        listing.title,
                         style: const TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       Text(
-                        time,
+                        "10 min ago",
                         style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                     ],
                   ),
                 ),
                 Text(
-                  "₹$price",
+                  "${listing.pricing.basePrice} ${listing.pricing.currency}",
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
@@ -188,26 +193,34 @@ class _HomePageScreenState extends State<HomePageScreen> {
               ],
             ),
             const SizedBox(height: 12),
-            // Title
             Text(
-              title,
+              listing.location,
               style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 6),
-            // Description
             Text(
-              description,
+              listing.description,
               style: TextStyle(fontSize: 14, color: Colors.grey[700]),
             ),
             const SizedBox(height: 12),
-            // Post Image
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.asset(
-                postImage,
-                height: 180,
-                width: double.infinity,
-                fit: BoxFit.cover,
+
+            GestureDetector(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => HomePageDetailScreen(listing: listing),
+                  ),
+                );
+              },
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: Image.network(
+                  listing.photos.first.url,
+                  height: 180,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
               ),
             ),
             const SizedBox(height: 12),
@@ -222,10 +235,24 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   ),
                 ),
                 const SizedBox(width: 10),
-                Icon(
-                  Icons.message_rounded,
-                  size: 40,
-                  color: const Color.fromARGB(255, 189, 186, 186),
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChatDetailScreen(
+                          name: listing.title.split(' - ').first,
+                          avatarUrl: listing.photos.first.url,
+                          isOnline: true,
+                        ),
+                      ),
+                    );
+                  },
+                  child: const Icon(
+                    Icons.message_rounded,
+                    size: 40,
+                    color: Color.fromARGB(255, 189, 186, 186),
+                  ),
                 ),
               ],
             ),

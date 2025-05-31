@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 
 class AppTheme {
-  static const Color primaryColor = Color.fromARGB(255, 186, 73, 7);
-  static const Color secondaryColor = Color.fromARGB(255, 28, 206, 238);
+  static const Color primaryColor = Color(0xFF0A6FBA);
+  static const Color secondaryColor = Color(0xFF09DBE9);
+  static const Color accentColor = Color(0xFFBA4907);
   static const Color appBarColor = Color(0xFF0A6FBA);
   static const Color textDark = Color(0xFF14142A);
   static const Color textMedium = Color(0xFF4E4866);
@@ -71,7 +72,6 @@ class AppTheme {
     colorScheme: ColorScheme.light(
       primary: primaryColor,
       secondary: accentBlue,
-
       surface: backgroundWhite,
       background: backgroundLighter,
     ),
