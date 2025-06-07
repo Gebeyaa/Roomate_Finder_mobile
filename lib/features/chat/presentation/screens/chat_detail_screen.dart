@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:arhibu/core/theme/app_theme.dart';
 
 class ChatDetailScreen extends StatefulWidget {
   final String name;
@@ -21,36 +20,20 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
   final List<ChatMessage> _messages = [];
+  final Color _orangeColor = Colors.orange; // Define orange color
+  final Color _lightOrange = Color(0xFFFFF3E0); // Light orange color
 
   @override
   void initState() {
     super.initState();
     _messages.addAll([
       ChatMessage(
-        text: 'Hi, is the room still available?',
+        text:
+            'Digital Technology is vulnerable in my country because there are slot of things one can not control outside the country, its messed up, what i am writing is messed up too. never mind',
         isMe: false,
-        time: '10:30 AM',
+        time: '900 PM',
       ),
-      ChatMessage(
-        text: 'Yes, it is! Would you like to know more details?',
-        isMe: true,
-        time: '10:31 AM',
-      ),
-      ChatMessage(
-        text: 'Yes please, what\'s the monthly rent?',
-        isMe: false,
-        time: '10:32 AM',
-      ),
-      ChatMessage(
-        text: 'The rent is 5,000 ETB per month, including utilities.',
-        isMe: true,
-        time: '10:33 AM',
-      ),
-      ChatMessage(
-        text: 'That sounds good! Can we schedule a viewing?',
-        isMe: false,
-        time: '10:35 AM',
-      ),
+      ChatMessage(text: '● ●', isMe: false, time: '900 PM'),
     ]);
   }
 
@@ -69,7 +52,8 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
         ChatMessage(
           text: _messageController.text,
           isMe: true,
-          time: DateTime.now().toString().substring(11, 16),
+          time:
+              '${DateTime.now().hour % 12}${DateTime.now().minute} ${DateTime.now().hour < 12 ? 'AM' : 'PM'}',
         ),
       );
     });
@@ -92,80 +76,24 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: AppTheme.primaryColor,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Stack(
-              children: [
-                CircleAvatar(
-                  radius: 20,
-                  backgroundImage: NetworkImage(widget.avatarUrl),
-                ),
-                if (widget.isOnline)
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        color: Colors.green,
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: Colors.white,
-                          width: 2,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
-            ),
-            const SizedBox(width: 12),
-            Flexible(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    widget.name,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 1,
-                  ),
-                  if (widget.isOnline)
-                    const Text(
-                      'Online',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.white70,
-                      ),
-                    ),
-                ],
-              ),
-            ),
-          ],
+        backgroundColor: Colors.white,
+        elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+        title: Text(
+          widget.name,
+          style: const TextStyle(
+            color: Colors.black,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.video_call),
-            onPressed: () {
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.call),
-            onPressed: () {
-              
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.more_vert),
-            onPressed: () {
-            
-            },
+            icon: const Icon(Icons.more_vert, color: Colors.black),
+            onPressed: () {},
           ),
         ],
       ),
@@ -174,61 +102,52 @@ class _ChatDetailScreenState extends State<ChatDetailScreen> {
           Expanded(
             child: ListView.builder(
               controller: _scrollController,
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               itemCount: _messages.length,
               itemBuilder: (context, index) {
                 final message = _messages[index];
-                return MessageBubble(message: message);
+                return MessageBubble(
+                  message: message,
+                  lightOrange: _lightOrange,
+                  orangeColor: _orangeColor,
+                );
               },
             ),
           ),
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(
               color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.1),
-                  spreadRadius: 1,
-                  blurRadius: 3,
-                  offset: const Offset(0, -1),
-                ),
-              ],
+              border: Border(top: BorderSide(color: Colors.grey.shade200)),
             ),
-            child: SafeArea(
-              child: Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.attach_file),
-                    onPressed: () {
-                      // Implement file attachment
-                    },
-                    color: AppTheme.primaryColor,
-                  ),
-                  Expanded(
+            child: Row(
+              children: [
+                Expanded(
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(24),
+                    ),
                     child: TextField(
                       controller: _messageController,
                       decoration: const InputDecoration(
-                        hintText: 'Type a message...',
+                        hintText: 'Type your message here...',
                         border: InputBorder.none,
                       ),
                       maxLines: null,
-                      textCapitalization: TextCapitalization.sentences,
                     ),
                   ),
-                  IconButton(
-                    icon: const Icon(
-                      Icons.send_rounded,
-                      size: 28,
-                      weight: 600,
-                    ),
+                ),
+                const SizedBox(width: 8),
+                CircleAvatar(
+                  backgroundColor: _orangeColor, // Orange send button
+                  child: IconButton(
+                    icon: const Icon(Icons.send, color: Colors.white),
                     onPressed: _sendMessage,
-                    color: AppTheme.accentColor,
-                    iconSize: 32,
-                    padding: const EdgeInsets.all(12),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ],
@@ -242,17 +161,20 @@ class ChatMessage {
   final bool isMe;
   final String time;
 
-  ChatMessage({
-    required this.text,
-    required this.isMe,
-    required this.time,
-  });
+  ChatMessage({required this.text, required this.isMe, required this.time});
 }
 
 class MessageBubble extends StatelessWidget {
   final ChatMessage message;
+  final Color lightOrange;
+  final Color orangeColor;
 
-  const MessageBubble({Key? key, required this.message}) : super(key: key);
+  const MessageBubble({
+    Key? key,
+    required this.message,
+    required this.lightOrange,
+    required this.orangeColor,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -260,37 +182,39 @@ class MessageBubble extends StatelessWidget {
       alignment: message.isMe ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
         margin: const EdgeInsets.symmetric(vertical: 4),
-        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        decoration: BoxDecoration(
-          color: message.isMe
-              ? AppTheme.primaryColor
-              : Colors.grey[200],
-          borderRadius: BorderRadius.circular(16),
-        ),
         constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.75,
+          maxWidth: MediaQuery.of(context).size.width * 0.8,
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment:
+              message.isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
           children: [
-            Text(
-              message.text,
-              style: TextStyle(
-                color: message.isMe ? Colors.white : Colors.black87,
-                fontSize: 16,
+            Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: message.isMe ? lightOrange : Colors.grey.shade200,
+                borderRadius: BorderRadius.circular(12),
+                border:
+                    message.isMe
+                        ? Border.all(color: orangeColor.withOpacity(0.3))
+                        : null,
+              ),
+              child: Text(
+                message.text,
+                style: TextStyle(
+                  color: message.isMe ? Colors.black : Colors.black,
+                  fontSize: 16,
+                ),
               ),
             ),
             const SizedBox(height: 4),
             Text(
               message.time,
-              style: TextStyle(
-                color: message.isMe ? Colors.white70 : Colors.grey[600],
-                fontSize: 12,
-              ),
+              style: TextStyle(color: Colors.grey.shade500, fontSize: 12),
             ),
           ],
         ),
       ),
     );
   }
-} 
+}

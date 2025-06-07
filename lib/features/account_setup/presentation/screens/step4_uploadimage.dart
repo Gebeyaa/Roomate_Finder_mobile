@@ -1,10 +1,9 @@
 import 'dart:io';
-
-import 'package:arhibu/features/account_setup/presentation/cubit/profile_setup_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:google_mlkit_face_detection/google_mlkit_face_detection.dart';
 import 'package:image_picker/image_picker.dart';
+
+import '../cubit/profile_setup_cubit.dart';
 
 class Step4UploadImage extends StatefulWidget {
   final VoidCallback onNext;
@@ -17,52 +16,92 @@ class Step4UploadImage extends StatefulWidget {
 
 class _Step4UploadImageState extends State<Step4UploadImage> {
   final List<File> _uploadedImages = [];
-  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  File? _selectedImage;
+  final ImagePicker _picker = ImagePicker();
+  final _formKey = GlobalKey<FormState>();
 
   Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final picked = await picker.pickImage(source: ImageSource.gallery);
-    if (picked != null) {
-      final file = File(picked.path);
-
-      final inputImage = InputImage.fromFile(file);
-      final faceDetector = FaceDetector(
-        options: FaceDetectorOptions(
-          performanceMode: FaceDetectorMode.accurate,
-          enableLandmarks: true,
-          enableClassification: true,
-        ),
+    try {
+      final XFile? image = await _picker.pickImage(
+        source: ImageSource.gallery,
+        maxWidth: 1024,
+        maxHeight: 1024,
+        imageQuality: 85,
       );
-      final faces = await faceDetector.processImage(inputImage);
 
-      if (faces.isEmpty) {
+      if (image != null) {
+        setState(() {
+          _uploadedImages.clear();
+          _uploadedImages.add(File(image.path));
+        });
+      }
+    } catch (e) {
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text(
-              'No human face detected! Please upload a clear photo of yourself.',
-            ),
+          SnackBar(
+            content: Text('Error picking image: ${e.toString()}'),
+            backgroundColor: Colors.red,
           ),
         );
-        return;
       }
-
-      setState(() {
-        if (_uploadedImages.length < 6) {
-          _uploadedImages.add(file);
-          _selectedImage = file;
-        }
-      });
     }
   }
 
+  void _removeImage(int index) {
+    setState(() {
+      _uploadedImages.removeAt(index);
+    });
+  }
+
   void _submitForm(BuildContext context) {
-    if (_formKey.currentState!.validate()) {
-      final cubit = context.read<ProfileSetupCubit>();
-      cubit.updateFormData({'uploadedImages': _uploadedImages});
-      widget.onNext();
-      cubit.nextStep();
+    if (!_formKey.currentState!.validate()) {
+      return;
     }
+
+    if (_uploadedImages.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Please upload a profile picture'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
+
+    final cubit = context.read<ProfileSetupCubit>();
+    cubit.updateFormData({
+      'profile_image': _uploadedImages.first.path,
+    });
+    widget.onNext();
+    cubit.nextStep();
+  }
+
+  InputDecoration _getInputDecoration({String? hintText}) {
+    return InputDecoration(
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
+      errorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: Colors.red),
+      ),
+      focusedErrorBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(8),
+        borderSide: const BorderSide(color: Colors.red),
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      isDense: true,
+      hintText: hintText,
+      hintStyle: const TextStyle(color: Colors.grey),
+    );
   }
 
   @override
@@ -70,170 +109,116 @@ class _Step4UploadImageState extends State<Step4UploadImage> {
     return Form(
       key: _formKey,
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              "Upload profile images",
+              'Profile Picture',
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: Color.fromARGB(255, 73, 27, 27),
               ),
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: 16),
             const Text(
-              "You can upload a minimum of 1 and maximum of 6 pictures.",
-              style: TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            const SizedBox(height: 8),
-            const Divider(color: Colors.grey, thickness: 1, height: 20),
-            const SizedBox(height: 32),
-
-            GestureDetector(
-              onTap: _pickImage,
-              child: Container(
-                width: double.infinity,
-                height: 200,
-                decoration: BoxDecoration(
-                  border: Border.all(color: Colors.grey.withOpacity(0.3)),
-                  borderRadius: BorderRadius.circular(8),
-                  color: Colors.grey[100],
-                ),
-
-                child:
-                    _selectedImage == null
-                        ? Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Icon(
-                              Icons.cloud_upload_outlined,
-                              size: 48,
-                              color: Colors.blue.withOpacity(0.6),
-                            ),
-                            const SizedBox(height: 12),
-                            const Text(
-                              "Tap here to upload your profile images.",
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.grey,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                          ],
-                        )
-                        : ClipRRect(
-                          borderRadius: BorderRadius.circular(8),
-                          child: Image.file(
-                            _selectedImage!,
-                            width: double.infinity,
-                            height: 200,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-              ),
+              'Add your profile picture',
+              style: TextStyle(fontSize: 16, color: Colors.grey),
             ),
             const SizedBox(height: 24),
 
-            if (_uploadedImages.isNotEmpty) ...[
-              GridView.builder(
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 3,
-                  crossAxisSpacing: 8,
-                  mainAxisSpacing: 8,
-                  childAspectRatio: 1,
-                ),
-                itemCount: _uploadedImages.length,
-                itemBuilder: (context, index) {
-                  final file = _uploadedImages[index];
-                  return Stack(
-                    children: [
-                      GestureDetector(
-                        onTap: () {
-                          setState(() {
-                            _selectedImage = file;
-                          });
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            color: Colors.grey[100],
-                            borderRadius: BorderRadius.circular(8),
-                            border: Border.all(
-                              color:
-                                  _selectedImage == file
-                                      ? Colors.blue
-                                      : Colors.grey[300]!,
-                              width: _selectedImage == file ? 2 : 1,
+            Container(
+              width: double.infinity,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(8),
+                border: Border.all(color: Colors.grey.shade300),
+              ),
+              child: _uploadedImages.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.add_photo_alternate_outlined,
+                            size: 48,
+                            color: Colors.grey[400],
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Upload Profile Picture',
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 16,
                             ),
                           ),
-                          child: ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.file(
-                              file,
-                              fit: BoxFit.cover,
-                              width: double.infinity,
-                              height: double.infinity,
+                          const SizedBox(height: 16),
+                          ElevatedButton.icon(
+                            onPressed: _pickImage,
+                            icon: const Icon(Icons.upload),
+                            label: const Text('Choose Image'),
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.blue,
+                              foregroundColor: Colors.white,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(8),
+                          child: Image.file(
+                            _uploadedImages.first,
+                            width: double.infinity,
+                            height: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        Positioned(
+                          top: 8,
+                          right: 8,
+                          child: IconButton(
+                            icon: const Icon(Icons.delete, color: Colors.white),
+                            onPressed: () => _removeImage(0),
+                            style: IconButton.styleFrom(
+                              backgroundColor: Colors.black54,
                             ),
                           ),
                         ),
-                      ),
-                      Positioned(
-                        top: 4,
-                        right: 4,
-                        child: GestureDetector(
-                          onTap:
-                              () => setState(() {
-                                if (_selectedImage == file) {
-                                  _selectedImage = null;
-                                }
-                                _uploadedImages.removeAt(index);
-                              }),
-                          child: Container(
-                            padding: const EdgeInsets.all(4),
-                            decoration: BoxDecoration(
-                              color: Colors.black.withOpacity(0.7),
-                              shape: BoxShape.circle,
-                            ),
-                            child: const Icon(
-                              Icons.close,
-                              size: 16,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
+                      ],
+                    ),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'Note: Please upload a clear, recent photo of yourself',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+                fontStyle: FontStyle.italic,
               ),
-              const SizedBox(height: 8),
-              Text(
-                "${_uploadedImages.length}/6 photos uploaded",
-                style: const TextStyle(fontSize: 14, color: Colors.grey),
-              ),
-              const SizedBox(height: 24),
-            ],
+            ),
+            const SizedBox(height: 32),
 
-            ElevatedButton(
-              onPressed: () {
-                Navigator.pushReplacementNamed(context, '/');
-                _uploadedImages.isNotEmpty ? () => _submitForm(context) : null;
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor:
-                    _uploadedImages.isNotEmpty ? Colors.blue : Colors.grey[400],
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 18),
-                textStyle: const TextStyle(fontSize: 16),
-                minimumSize: const Size(double.infinity, 50),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: () => _submitForm(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blue,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                child: const Text(
+                  'Next',
+                  style: TextStyle(fontSize: 18),
                 ),
               ),
-              child: const Text('Next'),
             ),
           ],
         ),

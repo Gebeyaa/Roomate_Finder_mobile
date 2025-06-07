@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:arhibu/features/chat/presentation/screens/chat_detail_screen.dart';
+import 'package:arhibu/features/profile/presentation/screens/profile_screen.dart';
+import 'package:arhibu/features/chat/presentation/screens/chat_screen.dart';
 
 import '../../domain/entities/listing_entity.dart';
 import '../../domain/usecases/get_listings.dart';
@@ -24,17 +26,46 @@ class _HomePageScreenState extends State<HomePageScreen> {
   String _searchQuery = "";
   List<ListingEntity> _allListings = [];
 
-  @override
-  void initState() {
-    super.initState();
-    _listingBloc = ListingBloc(context.read<GetListings>());
-    _listingBloc.add(LoadListings());
-  }
+  int _selectedIndex = 0;
 
-  @override
-  void dispose() {
-    _listingBloc.close();
-    super.dispose();
+  static final List<Widget> _screens = <Widget>[
+    _buildHomePageContent(),
+    const ProfileScreen(),
+    const ChatScreen(),
+  ];
+
+  static Widget _buildHomePageContent() {
+    return BlocBuilder<ListingBloc, ListingState>(
+      builder: (context, state) {
+        if (state is ListingLoading) {
+          return const Center(child: CircularProgressIndicator());
+        } else if (state is ListingLoaded) {
+          final listings = state.listings;
+          return ListView.builder(
+            padding: const EdgeInsets.all(16),
+            itemCount: listings.length,
+            itemBuilder: (context, index) {
+              final listing = listings[index];
+              return GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder:
+                          (_) => HomePageDetailScreen(listing: listing),
+                    ),
+                  );
+                },
+                child: _buildRoommateCard(listing),
+              );
+            },
+          );
+        } else if (state is ListingError) {
+          return Center(child: Text("Error: ${state.message}"));
+        }
+        return const SizedBox.shrink();
+      },
+    );
   }
 
   void _onSearchSubmitted(String value) {
@@ -46,6 +77,25 @@ class _HomePageScreenState extends State<HomePageScreen> {
         ),
       );
     }
+  }
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _listingBloc = ListingBloc(context.read<GetListings>());
+    _listingBloc.add(LoadListings());
+  }
+
+  @override
+  void dispose() {
+    _listingBloc.close();
+    super.dispose();
   }
 
   @override
@@ -104,44 +154,26 @@ class _HomePageScreenState extends State<HomePageScreen> {
               ),
           ],
         ),
-        body: BlocBuilder<ListingBloc, ListingState>(
-          builder: (context, state) {
-            if (state is ListingLoading) {
-              return const Center(child: CircularProgressIndicator());
-            } else if (state is ListingLoaded) {
-              _allListings = state.listings;
-              final listings =
-                  state.listings.where((listing) {
-                    if (_searchQuery.isEmpty) return true;
-                    final query = _searchQuery.toLowerCase();
-                    return listing.title.toLowerCase().contains(query) ||
-                        listing.location.toLowerCase().contains(query) ||
-                        listing.description.toLowerCase().contains(query);
-                  }).toList();
-              return ListView.builder(
-                padding: const EdgeInsets.all(16),
-                itemCount: listings.length,
-                itemBuilder: (context, index) {
-                  final listing = listings[index];
-                  return GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder:
-                              (_) => HomePageDetailScreen(listing: listing),
-                        ),
-                      );
-                    },
-                    child: _buildRoommateCard(listing),
-                  );
-                },
-              );
-            } else if (state is ListingError) {
-              return Center(child: Text("Error: ${state.message}"));
-            }
-            return const SizedBox.shrink();
-          },
+        body: _screens[_selectedIndex],
+        bottomNavigationBar: BottomNavigationBar(
+          items: const <BottomNavigationBarItem>[
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profile',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.chat_bubble_outline),
+              label: 'Chat',
+            ),
+          ],
+          currentIndex: _selectedIndex,
+          selectedItemColor: Theme.of(context).primaryColor,
+          unselectedItemColor: Colors.grey,
+          onTap: _onItemTapped,
         ),
       ),
     );
@@ -248,11 +280,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                       ),
                     );
                   },
-                  child: const Icon(
-                    Icons.message_rounded,
-                    size: 40,
-                    color: Color.fromARGB(255, 189, 186, 186),
-                  ),
+                  child: const Icon(Icons.message, size: 20),
                 ),
               ],
             ),
