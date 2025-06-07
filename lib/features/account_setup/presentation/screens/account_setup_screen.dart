@@ -7,6 +7,7 @@ import 'step1_personalinfo.dart';
 import 'step2_location.dart';
 import 'step3_lifestyle.dart';
 import 'step4_uploadimage.dart';
+import 'step5_ammenities.dart';
 
 class AccountSetUp extends StatefulWidget {
   const AccountSetUp({super.key});
@@ -17,16 +18,35 @@ class AccountSetUp extends StatefulWidget {
 
 class _AccountSetUpState extends State<AccountSetUp> {
   int _currentStep = 0;
+  final ScrollController _scrollController = ScrollController();
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
 
   void _goToNextStep() {
-    if (_currentStep < 3) {
+    if (_currentStep < 4) {
       setState(() => _currentStep++);
+      // Scroll to top when changing steps
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
     }
   }
 
   void _goToPreviousStep() {
     if (_currentStep > 0) {
       setState(() => _currentStep--);
+      // Scroll to top when changing steps
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeInOut,
+      );
     }
   }
 
@@ -57,88 +77,102 @@ class _AccountSetUpState extends State<AccountSetUp> {
               stops: [0.05, 0.3],
             ),
           ),
-          child: SingleChildScrollView(
-            child: Padding(
-              padding: const EdgeInsets.all(5.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (_currentStep > 0)
-                    GestureDetector(
-                      onTap: _goToPreviousStep,
-                      child: Container(
-                        padding: const EdgeInsets.only(bottom: 16),
-                        child: const Icon(
-                          Icons.arrow_back,
-                          size: 28,
-                          color: Colors.blue,
-                        ),
-                      ),
-                    ),
-                  Column(
+          child: SafeArea(
+            child: SingleChildScrollView(
+              controller: _scrollController,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  minHeight: MediaQuery.of(context).size.height - 
+                      AppBar().preferredSize.height - 
+                      MediaQuery.of(context).padding.top,
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        "Set up your account to find roommate/room",
-                        style: TextStyle(
-                          color: const Color.fromARGB(255, 73, 27, 27),
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+                      if (_currentStep > 0)
+                        GestureDetector(
+                          onTap: _goToPreviousStep,
+                          child: Container(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: const Icon(
+                              Icons.arrow_back,
+                              size: 28,
+                              color: Colors.blue,
+                            ),
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      const Text(
-                        'Hollai, Fill in the details to complete sign up',
-                        style: TextStyle(fontSize: 14, color: Colors.grey),
+                      Column(
+                        children: [
+                          Text(
+                            "Set up your account to find roommate/room",
+                            style: TextStyle(
+                              color: const Color.fromARGB(255, 73, 27, 27),
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          const Text(
+                            'Hollai, Fill in the details to complete sign up',
+                            style: TextStyle(fontSize: 14, color: Colors.grey),
+                          ),
+                          const SizedBox(height: 30),
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                for (int i = 0; i < 5; i++) ...[
+                                  _buildStepIndicator(
+                                    i == _currentStep
+                                        ? "step ${_currentStep + 1}/5"
+                                        : "",
+                                    isActive: _currentStep >= i,
+                                  ),
+                                  if (i < 4)
+                                    _buildStepConnector(isActive: _currentStep > i),
+                                ],
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                       const SizedBox(height: 30),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          for (int i = 0; i < 4; i++) ...[
-                            _buildStepIndicator(
-                              i == _currentStep
-                                  ? "step ${_currentStep + 1}/5"
-                                  : "",
-                              isActive: _currentStep >= i,
+                      Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(12),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              spreadRadius: 2,
+                              blurRadius: 5,
+                              offset: const Offset(0, 3),
                             ),
-                            if (i < 3)
-                              _buildStepConnector(isActive: _currentStep > i),
                           ],
-                        ],
+                        ),
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (_currentStep == 0)
+                              Step1Personalinfo(onNext: _goToNextStep),
+                            if (_currentStep == 1)
+                              Step2Location(onNext: _goToNextStep),
+                            if (_currentStep == 2)
+                              Step3Lifestyle(onNext: _goToNextStep),
+                            if (_currentStep == 3)
+                              Step4UploadImage(onNext: _goToNextStep),
+                            if (_currentStep == 4)
+                              Step5Ammenities(onNext: _goToNextStep),
+                          ],
+                        ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 30),
-                  Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.2),
-                          spreadRadius: 2,
-                          blurRadius: 5,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        if (_currentStep == 0)
-                          Step1Personalinfo(onNext: _goToNextStep),
-
-                        if (_currentStep == 1)
-                          Step2Location(onNext: _goToNextStep),
-                        if (_currentStep == 2)
-                          Step3Lifestyle(onNext: _goToNextStep),
-                        if (_currentStep == 3)
-                          Step4UploadImage(onNext: _goToNextStep),
-                      ],
-                    ),
-                  ),
-                ],
+                ),
               ),
             ),
           ),

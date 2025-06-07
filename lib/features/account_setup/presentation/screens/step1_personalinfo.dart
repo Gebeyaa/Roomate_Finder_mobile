@@ -1,7 +1,6 @@
 import 'package:arhibu/features/account_setup/presentation/cubit/profile_setup_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl_phone_field/intl_phone_field.dart';
 
 class Step1Personalinfo extends StatefulWidget {
   final VoidCallback onNext;
@@ -14,63 +13,64 @@ class Step1Personalinfo extends StatefulWidget {
 
 class _Step1PersonalinfoState extends State<Step1Personalinfo> {
   final _formKey = GlobalKey<FormState>();
+  final TextEditingController _fullNameController = TextEditingController();
   final TextEditingController _ageController = TextEditingController();
-  final TextEditingController _phonenumberController = TextEditingController();
-  final TextEditingController _budgetController = TextEditingController();
-  final TextEditingController _moveInDateController = TextEditingController();
-  final TextEditingController _leaseDurationController =
-      TextEditingController();
   final TextEditingController _homeTownController = TextEditingController();
   final TextEditingController _occupationController = TextEditingController();
-  final TextEditingController _aboutYouController = TextEditingController();
 
-  String? _petsPerson;
   String? _gender = "Female";
-  String? _offeringRoom;
   String? _selectedState = 'Addis Ababa';
   String? _relationshipStatus = "Single";
 
   @override
-  void initState() {
-    super.initState();
-  }
-
-  @override
   void dispose() {
+    _fullNameController.dispose();
     _ageController.dispose();
-    _phonenumberController.dispose();
-    _budgetController.dispose();
-    _moveInDateController.dispose();
-    _leaseDurationController.dispose();
     _homeTownController.dispose();
     _occupationController.dispose();
-    _aboutYouController.dispose();
     super.dispose();
+  }
+
+  String? _validateFullName(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Full name is required';
+    }
+    if (value.trim().length < 3) {
+      return 'Full name must be at least 3 characters';
+    }
+    if (value.trim().length > 50) {
+      return 'Full name cannot exceed 50 characters';
+    }
+    return null;
   }
 
   void _submitForm(BuildContext context) {
     if (_formKey.currentState!.validate()) {
       final cubit = context.read<ProfileSetupCubit>();
       final formData = {
+        'full_name': _fullNameController.text.trim(),
         'state': _selectedState,
         'age': _ageController.text,
         'gender': _gender,
-        'phone': _phonenumberController.text,
-        'offeringRoom': _offeringRoom,
-        'budget': _budgetController.text,
-        'moveInDate': _moveInDateController.text,
-        'leaseDuration': _leaseDurationController.text,
-        'petsPerson': _petsPerson,
         'occupation': _occupationController.text,
-        'relationship': _relationshipStatus,
-        'homeTown': _homeTownController.text,
-        'aboutYou': _aboutYouController.text,
+        'relationship_status': _relationshipStatus,
+        'home_town': _homeTownController.text,
       };
 
       cubit.updateFormData(formData);
       widget.onNext();
       cubit.nextStep();
     }
+  }
+
+  InputDecoration _getInputDecoration({String? hintText}) {
+    return InputDecoration(
+      filled: true,
+      fillColor: Colors.grey[100],
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      hintText: hintText,
+      hintStyle: const TextStyle(color: Colors.grey),
+    );
   }
 
   @override
@@ -92,6 +92,30 @@ class _Step1PersonalinfoState extends State<Step1Personalinfo> {
               ),
               const SizedBox(height: 24),
 
+              // Full Name Field
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    "Full Name",
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(height: 8),
+                  TextFormField(
+                    controller: _fullNameController,
+                    decoration: _getInputDecoration(
+                      hintText: 'Enter your full name',
+                    ),
+                    style: const TextStyle(fontSize: 16),
+                    validator: _validateFullName,
+                    textCapitalization: TextCapitalization.words,
+                    textInputAction: TextInputAction.next,
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              // State Field
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -135,37 +159,7 @@ class _Step1PersonalinfoState extends State<Step1Personalinfo> {
               ),
               const SizedBox(height: 20),
 
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Phone number",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 8),
-
-                  IntlPhoneField(
-                    decoration: InputDecoration(
-                      labelText: 'Phone Number',
-                      border: OutlineInputBorder(borderSide: BorderSide()),
-                    ),
-                    initialCountryCode: 'ET', // Ethiopia
-                    onChanged: (phone) {},
-                    validator: (phone) {
-                      if (phone == null || phone.number.isEmpty) {
-                        return 'Please enter your phone number';
-                      }
-                      // Ethiopian local numbers are 8 digits
-                      if (!RegExp(r'^\d{8}$').hasMatch(phone.number)) {
-                        return 'Enter 8 digit Ethiopian number';
-                      }
-                      return null;
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-
+              // Gender Field
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -198,7 +192,6 @@ class _Step1PersonalinfoState extends State<Step1Personalinfo> {
                         _gender = value;
                       });
                     },
-
                     validator: (value) {
                       if (value == null || value.isEmpty) {
                         return 'Please select your gender';
@@ -210,6 +203,7 @@ class _Step1PersonalinfoState extends State<Step1Personalinfo> {
               ),
               const SizedBox(height: 20),
 
+              // Age Field
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -218,7 +212,6 @@ class _Step1PersonalinfoState extends State<Step1Personalinfo> {
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
                   ),
                   const SizedBox(height: 8),
-
                   TextFormField(
                     controller: _ageController,
                     keyboardType: TextInputType.number,
@@ -251,6 +244,7 @@ class _Step1PersonalinfoState extends State<Step1Personalinfo> {
               ),
               const SizedBox(height: 20),
 
+              // Relationship Status Field
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -294,6 +288,7 @@ class _Step1PersonalinfoState extends State<Step1Personalinfo> {
               ),
               const SizedBox(height: 20),
 
+              // Occupation Field
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -323,7 +318,7 @@ class _Step1PersonalinfoState extends State<Step1Personalinfo> {
               ),
               const SizedBox(height: 20),
 
-              // Home town field
+              // Home Town Field
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -353,39 +348,7 @@ class _Step1PersonalinfoState extends State<Step1Personalinfo> {
               ),
               const SizedBox(height: 20),
 
-              // About you field
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    "Tell us something about yourself",
-                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: _aboutYouController,
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.grey[100],
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 16,
-                      ),
-                      hintText: "Write about yourself...",
-                    ),
-                    minLines: 4,
-                    maxLines: null,
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Please tell us about yourself';
-                      }
-                      return null;
-                    },
-                  ),
-                ],
-              ),
-              const SizedBox(height: 30),
-
+              // Next Button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(

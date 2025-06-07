@@ -1,6 +1,7 @@
 import 'package:arhibu/core/navigation/main_navigation.dart';
 import 'package:arhibu/features/account_setup/presentation/bloc/account_setup_bloc.dart';
 import 'package:arhibu/features/account_setup/presentation/screens/account_setup_screen.dart';
+import 'package:arhibu/features/account_setup/presentation/screens/step5_ammenities.dart';
 import 'package:arhibu/features/auth/presentation/bloc/login_bloc.dart';
 import 'package:arhibu/features/auth/presentation/bloc/signup_bloc.dart';
 import 'package:arhibu/features/auth/presentation/screens/getstarted_screen.dart';
@@ -70,6 +71,8 @@ class RouteBuilder {
       RouteNames.profile:
           (context) =>
               MainNavigation(initialIndex: 3, child: const AccountSetUp()),
+
+      // RouteNames.step5: (context) => const Step5Ammenities(),
     };
   }
 }
