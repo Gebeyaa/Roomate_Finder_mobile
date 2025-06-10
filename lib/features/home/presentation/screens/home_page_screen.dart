@@ -1,15 +1,13 @@
+import 'package:arhibu/features/chat/presentation/screens/chat_detail_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:arhibu/features/chat/presentation/screens/chat_detail_screen.dart';
-import 'package:arhibu/features/profile/presentation/screens/profile_screen.dart';
-import 'package:arhibu/features/chat/presentation/screens/chat_screen.dart';
 
 import '../../domain/entities/listing_entity.dart';
-import '../../domain/usecases/get_listings.dart';
 import '../bloc/listing_bloc.dart';
 import '../bloc/listing_event.dart';
 import '../bloc/listing_state.dart';
+import 'filter_screen.dart';
 import 'home_page_detail.dart';
 import 'search_screen.dart';
 
@@ -26,21 +24,33 @@ class _HomePageScreenState extends State<HomePageScreen> {
   String _searchQuery = "";
   List<ListingEntity> _allListings = [];
 
-  int _selectedIndex = 0;
+  @override
+  void initState() {
+    super.initState();
+    _listingBloc = BlocProvider.of<ListingBloc>(context);
+    _listingBloc.add(LoadListings());
+  }
 
-  static final List<Widget> _screens = <Widget>[
-    _buildHomePageContent(),
-    const ProfileScreen(),
-    const ChatScreen(),
-  ];
+  @override
+  void dispose() {
+    super.dispose();
+  }
 
-  static Widget _buildHomePageContent() {
+  Widget _buildHomePageContent() {
     return BlocBuilder<ListingBloc, ListingState>(
       builder: (context, state) {
         if (state is ListingLoading) {
           return const Center(child: CircularProgressIndicator());
         } else if (state is ListingLoaded) {
-          final listings = state.listings;
+          _allListings = state.listings;
+          final listings =
+              state.listings.where((listing) {
+                if (_searchQuery.isEmpty) return true;
+                final query = _searchQuery.toLowerCase();
+                return listing.title.toLowerCase().contains(query) ||
+                    listing.location.toLowerCase().contains(query) ||
+                    listing.description.toLowerCase().contains(query);
+              }).toList();
           return ListView.builder(
             padding: const EdgeInsets.all(16),
             itemCount: listings.length,
@@ -51,8 +61,7 @@ class _HomePageScreenState extends State<HomePageScreen> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder:
-                          (_) => HomePageDetailScreen(listing: listing),
+                      builder: (_) => HomePageDetailScreen(listing: listing),
                     ),
                   );
                 },
@@ -65,117 +74,6 @@ class _HomePageScreenState extends State<HomePageScreen> {
         }
         return const SizedBox.shrink();
       },
-    );
-  }
-
-  void _onSearchSubmitted(String value) {
-    if (value.trim().isNotEmpty && _allListings.isNotEmpty) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (_) => SearchScreen(searchQuery: value, listings: _allListings),
-        ),
-      );
-    }
-  }
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _listingBloc = ListingBloc(context.read<GetListings>());
-    _listingBloc.add(LoadListings());
-  }
-
-  @override
-  void dispose() {
-    _listingBloc.close();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return BlocProvider.value(
-      value: _listingBloc,
-      child: Scaffold(
-        appBar: AppBar(
-          automaticallyImplyLeading: false,
-          leading: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: SvgPicture.asset('images/Vector.svg', color: Colors.white),
-          ),
-          title:
-              _showSearchBar
-                  ? TextField(
-                    autofocus: true,
-                    decoration: const InputDecoration(
-                      hintText: "Search listings...",
-                      border: InputBorder.none,
-                    ),
-                    onChanged: (value) {
-                      setState(() {
-                        _searchQuery = value;
-                      });
-                    },
-                    onSubmitted: _onSearchSubmitted,
-                    textInputAction: TextInputAction.search,
-                  )
-                  : const Text("Roommates"),
-          actions: [
-            if (!_showSearchBar)
-              Padding(
-                padding: const EdgeInsets.only(right: 16.0),
-                child: IconButton(
-                  icon: const Icon(Icons.search, size: 24),
-                  onPressed: () {
-                    setState(() {
-                      _showSearchBar = true;
-                    });
-                  },
-                ),
-              ),
-            if (_showSearchBar)
-              Padding(
-                padding: const EdgeInsets.only(right: 16.0),
-                child: IconButton(
-                  icon: const Icon(Icons.close, size: 24),
-                  onPressed: () {
-                    setState(() {
-                      _showSearchBar = false;
-                      _searchQuery = "";
-                    });
-                  },
-                ),
-              ),
-          ],
-        ),
-        body: _screens[_selectedIndex],
-        bottomNavigationBar: BottomNavigationBar(
-          items: const <BottomNavigationBarItem>[
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: 'Home',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: 'Profile',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.chat_bubble_outline),
-              label: 'Chat',
-            ),
-          ],
-          currentIndex: _selectedIndex,
-          selectedItemColor: Theme.of(context).primaryColor,
-          unselectedItemColor: Colors.grey,
-          onTap: _onItemTapped,
-        ),
-      ),
     );
   }
 
@@ -272,21 +170,107 @@ class _HomePageScreenState extends State<HomePageScreen> {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (context) => ChatDetailScreen(
-                          name: listing.title.split(' - ').first,
-                          avatarUrl: listing.photos.first.url,
-                          isOnline: true,
-                        ),
+                        builder:
+                            (context) => ChatDetailScreen(
+                              name: listing.title.split(' - ').first,
+                              avatarUrl: listing.photos.first.url,
+                              isOnline: true,
+                            ),
                       ),
                     );
                   },
-                  child: const Icon(Icons.message, size: 20),
+                  child: Icon(Icons.chat_bubble_outline),
                 ),
               ],
             ),
           ],
         ),
       ),
+    );
+  }
+
+  void _onSearchSubmitted(String value) {
+    if (value.trim().isNotEmpty && _allListings.isNotEmpty) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder:
+              (_) => SearchScreen(searchQuery: value, listings: _allListings),
+        ),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: false,
+        leading: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: SvgPicture.asset('images/Vector.svg', color: Colors.white),
+        ),
+        title:
+            _showSearchBar
+                ? TextField(
+                  autofocus: true,
+                  decoration: const InputDecoration(
+                    hintText: "Search listings...",
+                    border: InputBorder.none,
+                  ),
+                  onChanged: (value) {
+                    setState(() {
+                      _searchQuery = value;
+                    });
+                  },
+                  onSubmitted: _onSearchSubmitted,
+                  textInputAction: TextInputAction.search,
+                )
+                : const Text("Roommates"),
+        actions: [
+          if (!_showSearchBar) ...[
+            Padding(
+              padding: const EdgeInsets.only(right: 8.0),
+              child: IconButton(
+                icon: const Icon(Icons.search, size: 24),
+                onPressed: () {
+                  setState(() {
+                    _showSearchBar = true;
+                  });
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: IconButton(
+                icon: const Icon(Icons.filter_list, size: 24),
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const FilterScreen(),
+                    ),
+                  );
+                },
+              ),
+            ),
+          ],
+          if (_showSearchBar)
+            Padding(
+              padding: const EdgeInsets.only(right: 16.0),
+              child: IconButton(
+                icon: const Icon(Icons.close, size: 24),
+                onPressed: () {
+                  setState(() {
+                    _showSearchBar = false;
+                    _searchQuery = "";
+                  });
+                },
+              ),
+            ),
+        ],
+      ),
+      body: _buildHomePageContent(),
     );
   }
 }
